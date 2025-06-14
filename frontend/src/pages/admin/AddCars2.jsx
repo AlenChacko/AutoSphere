@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AdminSidebar from "../../components/admin/AdminSidebar";
-import { useAdmin } from "../../context/AdminContext";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -16,9 +16,9 @@ const bodyOptions = [
 
 const driveTrainOptions = ["FWD", "RWD", "AWD", "4x4"];
 const fuelOptionsList = ["Petrol", "Diesel", "CNG", "Electric", "Hybrid"];
-const transmissionOptions = ["CVT", "DSG", "DCT", "AMT", "MT", "TC"];
+const transmissionOptions = ["CVT", "DSG", "DCT", "AMT","MT","TC"];
 
-const AddCars = () => {
+const AddCars2 = () => {
   const [formData, setFormData] = useState({
     company: "",
     model: "",
@@ -36,9 +36,8 @@ const AddCars = () => {
 
   const [previewImages, setPreviewImages] = useState([]);
   const [engineTypes, setEngineTypes] = useState([""]);
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { addCar, loading } = useAdmin();
 
   const handleArrayChange = (field, index, value) => {
     const updated = [...formData[field]];
@@ -89,37 +88,46 @@ const AddCars = () => {
     setFormData({ ...formData, driveTrains: updated });
   };
 
-  const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const data = new FormData();
+
+    data.append("company", formData.company);
+    data.append("model", formData.model);
+    data.append("priceStart", formData.price.start);
+    data.append("priceFinal", formData.price.final);
+    data.append("body", formData.body);
+    data.append("fuelOptions", JSON.stringify(formData.fuelOptions));
+    data.append("driveTrains", JSON.stringify(formData.driveTrains));
+    data.append("transmission", JSON.stringify(formData.transmission));
+    data.append("colors", JSON.stringify(formData.colors));
+    data.append("descriptions", formData.descriptions);
+    data.append("spec", JSON.stringify(formData.spec));
+
+    if (formData.logo) {
+      data.append("logo", formData.logo);
+    }
+
+    formData.images.forEach((img) => data.append("images", img));
+
     try {
-      await addCar(formData);
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/add-cars`,
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        }
+      );
+
       toast.success("Car uploaded successfully!");
-
-      // Reset form
-      setFormData({
-        company: "",
-        model: "",
-        price: { start: "", final: "" },
-        body: "",
-        fuelOptions: [],
-        driveTrains: [],
-        transmission: [],
-        colors: [""],
-        descriptions: "",
-        logo: null,
-        images: [],
-        spec: {},
-      });
-      setPreviewImages([]);
-
-      // Redirect after short delay (optional)
-      setTimeout(() => {
-        navigate("/admin/dashboard");
-      }, 1000);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to upload car. Check console.");
+      navigate("/admin/dashboard");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload car");
     }
   };
 
@@ -302,52 +310,50 @@ const AddCars = () => {
 
           {/* --- Specs --- */}
           <div>
-            <label className="block font-semibold mb-2 text-gray-700">
-              Engine Specifications
-            </label>
+  <label className="block font-semibold mb-2 text-gray-700">Engine Specifications</label>
 
-            {engineTypes.map((type, idx) => (
-              <div key={idx} className="grid md:grid-cols-3 gap-4 mb-4">
-                <input
-                  type="text"
-                  placeholder="Engine Type (e.g. turboPetrol)"
-                  className="input-style"
-                  value={type}
-                  onChange={(e) => {
-                    const updatedTypes = [...engineTypes];
-                    updatedTypes[idx] = e.target.value;
-                    setEngineTypes(updatedTypes);
-                  }}
-                />
+  {engineTypes.map((type, idx) => (
+    <div key={idx} className="grid md:grid-cols-3 gap-4 mb-4">
+      <input
+        type="text"
+        placeholder="Engine Type (e.g. turboPetrol)"
+        className="input-style"
+        value={type}
+        onChange={(e) => {
+          const updatedTypes = [...engineTypes];
+          updatedTypes[idx] = e.target.value;
+          setEngineTypes(updatedTypes);
+        }}
+      />
 
-                <input
-                  type="number"
-                  placeholder="Power (e.g. 120)"
-                  className="input-style"
-                  onChange={(e) =>
-                    handleSpecChange(engineTypes[idx], "power", e.target.value)
-                  }
-                />
+      <input
+        type="number"
+        placeholder="Power (e.g. 120)"
+        className="input-style"
+        onChange={(e) =>
+          handleSpecChange(engineTypes[idx], "power", e.target.value)
+        }
+      />
 
-                <input
-                  type="number"
-                  placeholder="Torque (e.g. 170)"
-                  className="input-style"
-                  onChange={(e) =>
-                    handleSpecChange(engineTypes[idx], "torque", e.target.value)
-                  }
-                />
-              </div>
-            ))}
+      <input
+        type="number"
+        placeholder="Torque (e.g. 170)"
+        className="input-style"
+        onChange={(e) =>
+          handleSpecChange(engineTypes[idx], "torque", e.target.value)
+        }
+      />
+    </div>
+  ))}
 
-            <button
-              type="button"
-              onClick={() => setEngineTypes([...engineTypes, ""])}
-              className="mt-1 text-blue-600 text-sm hover:underline"
-            >
-              + Add More
-            </button>
-          </div>
+  <button
+    type="button"
+    onClick={() => setEngineTypes([...engineTypes, ""])}
+    className="mt-1 text-blue-600 text-sm hover:underline"
+  >
+    + Add More
+  </button>
+</div>
 
           {/* --- Upload Logo --- */}
           <div>
@@ -399,4 +405,4 @@ const AddCars = () => {
   );
 };
 
-export default AddCars;
+export default AddCars2;

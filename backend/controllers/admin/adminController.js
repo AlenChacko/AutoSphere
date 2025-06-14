@@ -21,8 +21,7 @@ export const addCars = handler(async (req, res) => {
   const logoFile = req.files?.logo?.[0];
   const imageFiles = req.files?.images || [];
 
-  console.log("🟡 req.body:", req.body);
-  console.log("🟡 req.files:", req.files);
+
 
   // Cloudinary/multer should provide 'path'
   const logoUrl = logoFile?.path || "";

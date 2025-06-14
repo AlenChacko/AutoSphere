@@ -19,6 +19,7 @@ import MainLayout from "./layouts/MainLayout";
 import PlainLayout from "./layouts/PlainLayout";
 
 import AdminProtectedRoute from "./layouts/AdminProtectedRoute"; 
+import AddCars2 from "./pages/admin/AddCars2";
 
 const App = () => {
   return (
@@ -57,7 +58,8 @@ const App = () => {
             path="/admin/add-car"
             element={
               <AdminProtectedRoute>
-                <AddCars />
+                {/* <AddCars /> */}
+                <AddCars2/>
               </AdminProtectedRoute>
             }
           />
