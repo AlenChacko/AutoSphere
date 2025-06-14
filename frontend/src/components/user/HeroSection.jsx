@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import b1 from '../../assets/images/banner/b1.jpg'
 import b2 from '../../assets/images/banner/b2.jpg'
-import b3 from '../../assets/images/banner/b3.jpg'
+import b3 from '../../assets/images/banner/Home.jpg'
 import b4 from '../../assets/images/banner/b4.jpg'
 import b5 from '../../assets/images/banner/b5.jpg'
 

@@ -200,6 +200,41 @@ import invicto2 from "./images/suzuki/invicto2.avif";
 import invicto3 from "./images/suzuki/invicto3.avif";
 import invicto4 from "./images/suzuki/invicto4.avif";
 
+// kia
+import kia from './images/kia/kia.avif'
+
+import carens1 from "./images/kia/carens1.avif";
+import carens2 from "./images/kia/carens2.avif";
+import carens3 from "./images/kia/carens3.avif";
+import carens4 from "./images/kia/carens4.avif";
+
+import seltos1 from "./images/kia/seltos1.avif";
+import seltos2 from "./images/kia/seltos2.avif";
+import seltos3 from "./images/kia/seltos3.avif";
+import seltos4 from "./images/kia/seltos4.avif";
+
+import sonet1 from "./images/kia/sonet1.avif";
+import sonet2 from "./images/kia/sonet2.avif";
+import sonet3 from "./images/kia/sonet3.avif";
+import sonet4 from "./images/kia/sonet4.avif";
+
+import ev6_1 from "./images/kia/ev6_1.avif";
+import ev6_2 from "./images/kia/ev6_2.avif";
+import ev6_3 from "./images/kia/ev6_3.avif";
+import ev6_4 from "./images/kia/ev6_4.avif";
+
+import carnival1 from "./images/kia/carnival1.avif";
+import carnival2 from "./images/kia/carnival2.avif";
+import carnival3 from "./images/kia/carnival3.avif";
+import carnival4 from "./images/kia/carnival4.avif";
+
+import syros1 from "./images/kia/syros1.avif";
+import syros2 from "./images/kia/syros2.avif";
+import syros3 from "./images/kia/syros3.avif";
+import syros4 from "./images/kia/syros4.avif";
+
+
+
 export const cars = [
   {
     company: "Toyota",
@@ -1039,6 +1074,7 @@ export const cars = [
       cng: { power: 56.6, torque: 82.1 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "Baleno",
@@ -1064,6 +1100,7 @@ export const cars = [
       cng: { power: 76.4, torque: 98.5 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "Ignis",
@@ -1088,6 +1125,7 @@ export const cars = [
       petrol: { power: 81.8, torque: 113 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "Fronx",
@@ -1114,6 +1152,7 @@ export const cars = [
       cng: { power: 76.4, torque: 98.5 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "Swift",
@@ -1140,6 +1179,7 @@ export const cars = [
       cng: { power: 72, torque: 98.5 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "Grand Vitara",
@@ -1192,6 +1232,7 @@ export const cars = [
       cng: { power: 87.83, torque: 121.5 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "Jimny",
@@ -1216,6 +1257,7 @@ export const cars = [
       petrol: { power: 103.06, torque: 134.2 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "Dzire",
@@ -1241,6 +1283,7 @@ export const cars = [
       cng: { power: 76.43, torque: 98.5 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "Ciaz",
@@ -1265,6 +1308,7 @@ export const cars = [
       petrol: { power: 103.25, torque: 138 },
     },
   },
+
   {
     company: "Maruti Suzuki",
     model: "XL6",
@@ -1290,6 +1334,7 @@ export const cars = [
       cng: { power: 87.83, torque: 121.5 },
     },
   },
+  
   {
     company: "Maruti Suzuki",
     model: "Invicto",
@@ -1307,4 +1352,119 @@ export const cars = [
       strongHybrid: { power: 183.72, torque: 188 },
     },
   },
+
+  {
+  company: "Kia",
+  model: "Carens",
+  price: { start: 10.52, final: 19.67 },
+  body: "6/7-Seater MPV",
+  fuelOptions: ["Petrol", "Diesel"],
+  driveTrains: ["FWD"],
+  transmission: ["6MT", "7DCT", "6AT", "iMT"],
+  colors: ["Imperial Blue", "Intense Red", "Glacier White Pearl", "Aurora Black Pearl", "Gravity Grey"],
+  descriptions:
+    "The Carens is a practical and stylish MPV with SUV-like stance, loaded with features and flexible seating—ideal for families seeking comfort and tech.",
+  logo: kia,
+  images: [carens1, carens2, carens3, carens4],
+  spec: {
+    petrol: { power: 115, torque: 144 },
+    diesel: { power: 116, torque: 250 },
+    turboPetrol: { power: 160, torque: 253 },
+  },
+},
+
+{
+  company: "Kia",
+  model: "Seltos",
+  price: { start: 10.90, final: 20.35 },
+  body: "Compact SUV",
+  fuelOptions: ["Petrol", "Diesel"],
+  driveTrains: ["FWD"],
+  transmission: ["6MT", "7DCT", "6AT", "iMT", "CVT"],
+  colors: ["Pewter Olive", "Imperial Blue", "Intense Red", "Glacier White Pearl", "Aurora Black Pearl"],
+  descriptions:
+    "Seltos is Kia’s best-selling SUV in India, offering cutting-edge features, powerful turbo options, and bold design—perfect for urban and highway drives.",
+  logo: kia,
+  images: [seltos1, seltos2, seltos3, seltos4],
+  spec: {
+    petrol: { power: 115, torque: 144 },
+    diesel: { power: 116, torque: 250 },
+    turboPetrol: { power: 160, torque: 253 },
+  },
+},
+
+{
+  company: "Kia",
+  model: "Sonet",
+  price: { start: 7.99, final: 15.75 },
+  body: "Subcompact SUV",
+  fuelOptions: ["Petrol", "Diesel"],
+  driveTrains: ["FWD"],
+  transmission: ["5MT", "6MT", "7DCT", "6AT", "iMT"],
+  colors: ["Intense Red", "Gravity Grey", "Aurora Black Pearl", "Imperial Blue", "Sparkling Silver"],
+  descriptions:
+    "A compact SUV with a big attitude—Sonet blends style, tech, and performance, making it a popular urban SUV among youth and small families.",
+  logo: kia,
+  images: [sonet1, sonet2, sonet3, sonet4],
+  spec: {
+    petrol: { power: 83, torque: 115 },
+    turboPetrol: { power: 120, torque: 172 },
+    diesel: { power: 116, torque: 250 },
+  },
+},
+
+{
+  company: "Kia",
+  model: "EV6",
+  price: { start: 60.95, final: 65.95 },
+  body: "Electric Crossover",
+  fuelOptions: ["Electric"],
+  driveTrains: ["RWD", "AWD"],
+  transmission: ["Single-Speed Automatic"],
+  colors: ["Runway Red", "Moonscape", "Aurora Black Pearl", "Snow White Pearl", "Yacht Blue"],
+  descriptions:
+    "EV6 is Kia's premium all-electric crossover, known for its futuristic design, long range, and performance—targeted at EV enthusiasts seeking exclusivity.",
+  logo: kia,
+  images: [ev6_1, ev6_2, ev6_3, ev6_4],
+  spec: {
+    ev: { power: 325, torque: 605, range: 708 }, // WLTP (AWD variant)
+  },
+},
+
+{
+  company: "Kia",
+  model: "Carnival",
+  price: { start: 30.00, final: 40.00 },
+  body: "Luxury MPV",
+  fuelOptions: ["Diesel"],
+  driveTrains: ["FWD"],
+  transmission: ["8-Speed AT"],
+  colors: ["Snow White Pearl", "Aurora Black Pearl", "Panthera Metal", "Silky Silver"],
+  descriptions:
+    "The Carnival is Kia’s premium MPV offering unmatched luxury, comfort, and space—ideal for business executives and large family travel.",
+  logo: kia,
+  images: [carnival1, carnival2, carnival3, carnival4],
+  spec: {
+    diesel: { power: 200, torque: 440 },
+  },
+},
+
+{
+  company: "Kia",
+  model: "Syros",
+  price: { start: 9.49, final: 17.80 }, // ₹ lakh
+  body: "Sub‑4m Compact SUV",
+  fuelOptions: ["Turbo‑Petrol (1.0 L)", "Turbo‑Diesel (1.5 L)"],
+  driveTrains: ["FWD"],
+  transmission: ["6MT", "7DCT", "6AT"],
+  colors: ["Glacier White Pearl", "Sparkling Silver", "Gravity Grey", "Imperial Blue", "Intense Red", "Pewter Olive", "Frost Blue", "Aurora Black Pearl"],
+  descriptions:
+    "Launched Feb 1 2025 in India, the Syros is a compact yet feature-packed SUV with a bold EV‑inspired design, sliding ventilated rear seats, Level 2 ADAS and a panoramic Trinity display.",
+  logo: kia,
+  images: [syros1, syros2, syros3, syros4],
+  spec: {
+    turboPetrol: { power: 118, torque: 172 },
+    turboDiesel: { power: 114, torque: 250 },
+  },
+},
 ];

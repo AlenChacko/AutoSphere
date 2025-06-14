@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { cars } from "../../assets/cars";
 
@@ -11,6 +11,8 @@ const CarDetails = () => {
       car.model.toLowerCase() === decodeURIComponent(model).toLowerCase()
   );
 
+  const [mainImage, setMainImage] = useState(selectedCar?.images[0]);
+
   if (!selectedCar) {
     return <div className="text-center mt-10 text-red-600">Car not found.</div>;
   }
@@ -20,10 +22,25 @@ const CarDetails = () => {
       <h2 className="text-4xl font-bold text-gray-800 mb-4">{selectedCar.model}</h2>
       <p className="text-gray-600 text-lg mb-6">{selectedCar.descriptions}</p>
 
-      {/* Image carousel */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {selectedCar.images.map((img, idx) => (
-          <img key={idx} src={img} alt={`car-${idx}`} className="rounded-lg w-full h-56 object-cover" />
+      {/* Main image */}
+      <div className="mb-4">
+        <img
+          src={mainImage}
+          alt="main"
+          className="rounded-xl w-full h-[400px] object-cover shadow-lg transition-all"
+        />
+      </div>
+
+      {/* Thumbnails */}
+      <div className="flex gap-4 mb-8">
+        {selectedCar.images.slice(1).map((img, idx) => (
+          <img
+            key={idx}
+            src={img}
+            alt={`thumb-${idx}`}
+            onClick={() => setMainImage(img)}
+            className="w-32 h-20 object-cover rounded-md cursor-pointer border-2 hover:border-blue-500 transition"
+          />
         ))}
       </div>
 
@@ -62,7 +79,9 @@ const CarDetails = () => {
         {Object.entries(selectedCar.spec).map(([fuelType, spec], idx) => (
           <div key={idx} className="mb-2">
             <p className="font-medium">{fuelType.toUpperCase()}:</p>
-            <p className="text-gray-700">Power: {spec.power} BHP | Torque: {spec.torque} Nm</p>
+            <p className="text-gray-700">
+              Power: {spec.power} BHP | Torque: {spec.torque} Nm
+            </p>
           </div>
         ))}
       </div>
