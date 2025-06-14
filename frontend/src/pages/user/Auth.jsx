@@ -1,10 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useFormik } from "formik";
-import { loginSchema,registerSchema } from "../../validations/UserAuthValidation";
+import {
+  loginSchema,
+  registerSchema,
+} from "../../validations/UserAuthValidation";
+import { useUser } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
+  const { user, loginUser } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   const formik = useFormik({
     initialValues: {
@@ -16,13 +31,34 @@ const Auth = () => {
     },
     validationSchema: isLogin ? loginSchema : registerSchema,
     enableReinitialize: true,
-    onSubmit: (values) => {
-      if (isLogin) {
-        console.log("Logging in with:", values.email, values.password);
-        // Call login API
-      } else {
-        console.log("Registering with:", values);
-        // Call register API
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        const endpoint = isLogin
+          ? `${import.meta.env.VITE_BACKEND_URL}/api/user/login`
+          : `${import.meta.env.VITE_BACKEND_URL}/api/user/register`;
+
+        const payload = isLogin
+          ? { email: values.email, password: values.password }
+          : {
+              firstName: values.firstName,
+              lastName: values.lastName,
+              email: values.email,
+              password: values.password,
+            };
+
+        const { data } = await axios.post(endpoint, payload);
+
+        loginUser(data.user); // ✅ Sets context and localStorage
+
+        toast.success(
+          data.message ||
+            (isLogin ? "Login successful" : "Registration successful")
+        );
+        navigate("/");
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      } finally {
+        setSubmitting(false);
       }
     },
   });
@@ -156,6 +192,7 @@ const Auth = () => {
 
           <button
             type="submit"
+            disabled={formik.isSubmitting}
             className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             {isLogin ? "Login" : "Register"}
