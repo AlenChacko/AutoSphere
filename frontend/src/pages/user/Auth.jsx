@@ -1,34 +1,31 @@
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { useFormik } from "formik";
+import { loginSchema,registerSchema } from "../../validations/UserAuthValidation";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isLogin) {
-      console.log("Logging in with:", formData.email, formData.password);
-      // Call login API
-    } else {
-      if (formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match");
-        return;
+  const formik = useFormik({
+    initialValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: isLogin ? loginSchema : registerSchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      if (isLogin) {
+        console.log("Logging in with:", values.email, values.password);
+        // Call login API
+      } else {
+        console.log("Registering with:", values);
+        // Call register API
       }
-      console.log("Registering with:", formData);
-      // Call register API
-    }
-  };
+    },
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -36,6 +33,7 @@ const Auth = () => {
         <h2 className="text-2xl font-bold text-center mb-6">
           {isLogin ? "Login to AutoSphere" : "Register for AutoSphere"}
         </h2>
+
         <div className="mb-4">
           <button
             type="button"
@@ -53,34 +51,47 @@ const Auth = () => {
           <span className="h-px flex-1 bg-gray-300"></span>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
           {!isLogin && (
             <div className="flex gap-4">
-  <div className="w-1/2">
-    <label className="block text-sm font-medium text-gray-700">First Name</label>
-    <input
-      type="text"
-      name="firstName"
-      value={formData.firstName}
-      onChange={handleChange}
-      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-      required
-    />
-  </div>
+              <div className="w-1/2">
+                <label className="block text-sm font-medium text-gray-700">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.firstName}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+                {formik.touched.firstName && formik.errors.firstName && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {formik.errors.firstName}
+                  </div>
+                )}
+              </div>
 
-  <div className="w-1/2">
-    <label className="block text-sm font-medium text-gray-700">Last Name</label>
-    <input
-      type="text"
-      name="lastName"
-      value={formData.lastName}
-      onChange={handleChange}
-      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-      required
-    />
-  </div>
-</div>
-
+              <div className="w-1/2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.lastName}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+                {formik.touched.lastName && formik.errors.lastName && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {formik.errors.lastName}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
 
           <div>
@@ -90,11 +101,16 @@ const Auth = () => {
             <input
               type="email"
               name="email"
-              value={formData.email}
-              onChange={handleChange}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.email}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-              required
             />
+            {formik.touched.email && formik.errors.email && (
+              <div className="text-red-500 text-xs mt-1">
+                {formik.errors.email}
+              </div>
+            )}
           </div>
 
           <div>
@@ -104,11 +120,16 @@ const Auth = () => {
             <input
               type="password"
               name="password"
-              value={formData.password}
-              onChange={handleChange}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.password}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-              required
             />
+            {formik.touched.password && formik.errors.password && (
+              <div className="text-red-500 text-xs mt-1">
+                {formik.errors.password}
+              </div>
+            )}
           </div>
 
           {!isLogin && (
@@ -119,11 +140,17 @@ const Auth = () => {
               <input
                 type="password"
                 name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.confirmPassword}
                 className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-                required
               />
+              {formik.touched.confirmPassword &&
+                formik.errors.confirmPassword && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {formik.errors.confirmPassword}
+                  </div>
+                )}
             </div>
           )}
 
@@ -138,6 +165,7 @@ const Auth = () => {
         <p className="mt-4 text-center text-sm text-gray-600">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
+            type="button"
             onClick={() => setIsLogin(!isLogin)}
             className="text-blue-600 hover:underline font-medium"
           >

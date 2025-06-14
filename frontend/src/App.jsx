@@ -1,5 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 import Auth from "./pages/user/Auth";
 import Home from "./pages/user/Home";
@@ -18,29 +20,33 @@ import PlainLayout from "./layouts/PlainLayout";
 
 const App = () => {
   return (
-    <Routes>
-      {/* Main UI Routes (with Navbar and Footer) */}
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/brands/:brand" element={<Cars />} />
-        <Route path="/car/:brand/:model" element={<CarDetails />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/wishlist" element={<WishlistPage />} />
-      </Route>
+    <>
+      <ToastContainer position="top-right" autoClose={1000} />
 
-      {/* Auth Route (no Navbar/Footer) */}
-      <Route element={<PlainLayout />}>
-        <Route path="/auth" element={<Auth />} />
-      </Route>
+      <Routes>
+        {/* Main UI Routes (with Navbar and Footer) */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/brands/:brand" element={<Cars />} />
+          <Route path="/car/:brand/:model" element={<CarDetails />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+        </Route>
 
-      {/* Admin Routes (no Navbar/Footer) */}
-      <Route element={<PlainLayout />}>
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/add-car" element={<AddCars />} />
-        <Route path="/admin/list-cars" element={<ListCars />} />
-      </Route>
-    </Routes>
+        {/* Auth Route (no Navbar/Footer) */}
+        <Route element={<PlainLayout />}>
+          <Route path="/auth" element={<Auth />} />
+        </Route>
+
+        {/* Admin Routes (no Navbar/Footer) */}
+        <Route element={<PlainLayout />}>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/add-car" element={<AddCars />} />
+          <Route path="/admin/list-cars" element={<ListCars />} />
+        </Route>
+      </Routes>
+    </>
   );
 };
 
