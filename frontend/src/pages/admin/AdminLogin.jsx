@@ -1,19 +1,22 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAdmin } from "../../context/AdminContext"; // Update path as per your folder structure
+import { toast } from "react-toastify";
 
 const AdminLogin = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+  const { loginAdmin } = useAdmin();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
 
@@ -22,8 +25,22 @@ const AdminLogin = () => {
       return;
     }
 
-    // TODO: Send login request to backend
-    console.log("Admin login submitted:", formData);
+    try {
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/login`,
+        { email, password }
+      );
+
+      // Save token in context and localStorage
+      loginAdmin({ token: data.token });
+
+      toast.success("Admin login successful");
+      navigate("/admin/dashboard"); // Change to your admin route
+    } catch (err) {
+      const message = err.response?.data?.message || "Invalid credentials";
+      setError(message);
+      toast.error(message);
+    }
   };
 
   return (

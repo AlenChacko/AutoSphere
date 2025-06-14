@@ -4,53 +4,97 @@ import {
   FaCar,
   FaSignOutAlt,
   FaTools,
-  FaHome,
   FaEdit,
   FaImage,
   FaClipboardList,
   FaPlus,
 } from "react-icons/fa";
 
+import { useNavigate } from "react-router-dom";
+import { useAdmin } from "../../context/AdminContext";
+import { toast } from "react-toastify";
+
 const AdminSidebar = () => {
   const location = useLocation();
+  const { logoutAdmin } = useAdmin();
+  const navigate = useNavigate();
 
-  const navItems = [
-    { label: "Add Cars", icon: <FaPlus />, path: "/admin/add-car" },
-    { label: "Edit Cars", icon: <FaEdit />, path: "/admin/edit-car" },
-    { label: "List Cars", icon: <FaCar />, path: "/admin/list-cars" }, // ✅ New Tab
-    { label: "Edit Banners", icon: <FaImage />, path: "/admin/edit-banner" },
-    {
-      label: "Test Drive Info",
-      icon: <FaClipboardList />,
-      path: "/admin/test-drives",
-    },
-    { label: "Others", icon: <FaTools />, path: "/admin/others" },
-    { label: "Logout", icon: <FaSignOutAlt />, path: "/admin/logout" },
-  ];
+  const handleLogout = () => {
+    logoutAdmin();
+    toast.success("Logged out successfully");
+    navigate("/admin/login");
+  };
+
+  const activeClass = "bg-blue-600 text-white";
+  const defaultClass = "hover:bg-gray-700";
+
+  const getLinkClasses = (path) =>
+    `flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+      location.pathname === path ? activeClass : defaultClass
+    }`;
 
   return (
     <aside className="h-screen w-64 bg-gray-900 text-white flex flex-col shadow-lg">
       <Link
-        to={"/admin/dashboard"}
+        to="/admin/dashboard"
         className="p-6 text-2xl font-bold text-center border-b border-gray-700"
       >
         AutoSphere
       </Link>
-      <nav className="flex-1 px-4 py-6 space-y-4">
-        {navItems.map((item) => (
-          <Link
-            key={item.label}
-            to={item.path}
-            className={`flex items-center space-x-3 px-4 py-2 rounded-lg transition-all ${
-              location.pathname === item.path
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-700"
-            }`}
-          >
-            <span>{item.icon}</span>
-            <span>{item.label}</span>
-          </Link>
-        ))}
+
+      <nav className="flex-1 px-4 py-6 space-y-2">
+        <Link to="/admin/add-car" className={getLinkClasses("/admin/add-car")}>
+          <FaPlus />
+          <span>Add Cars</span>
+        </Link>
+
+        <Link
+          to="/admin/edit-car"
+          className={getLinkClasses("/admin/edit-car")}
+        >
+          <FaEdit />
+          <span>Edit Cars</span>
+        </Link>
+
+        <Link
+          to="/admin/list-cars"
+          className={getLinkClasses("/admin/list-cars")}
+        >
+          <FaCar />
+          <span>List Cars</span>
+        </Link>
+
+        <Link
+          to="/admin/edit-banner"
+          className={getLinkClasses("/admin/edit-banner")}
+        >
+          <FaImage />
+          <span>Edit Banners</span>
+        </Link>
+
+        <Link
+          to="/admin/test-drives"
+          className={getLinkClasses("/admin/test-drives")}
+        >
+          <FaClipboardList />
+          <span>Test Drive Info</span>
+        </Link>
+
+        <Link to="/admin/others" className={getLinkClasses("/admin/others")}>
+          <FaTools />
+          <span>Others</span>
+        </Link>
+
+        <Link
+          to="/admin/logout"
+          className={`${getLinkClasses(
+            "/admin/logout"
+          )} text-red-400 hover:text-white`}
+          onClick={handleLogout}
+        >
+          <FaSignOutAlt />
+          <span>Logout</span>
+        </Link>
       </nav>
     </aside>
   );

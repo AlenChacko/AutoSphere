@@ -18,6 +18,8 @@ import ListCars from "./pages/admin/ListCars";
 import MainLayout from "./layouts/MainLayout";
 import PlainLayout from "./layouts/PlainLayout";
 
+import AdminProtectedRoute from "./layouts/AdminProtectedRoute"; 
+
 const App = () => {
   return (
     <>
@@ -33,17 +35,40 @@ const App = () => {
           <Route path="/wishlist" element={<WishlistPage />} />
         </Route>
 
-        {/* Auth Route (no Navbar/Footer) */}
+        {/* User Auth Route (no Navbar/Footer) */}
         <Route element={<PlainLayout />}>
           <Route path="/auth" element={<Auth />} />
         </Route>
 
-        {/* Admin Routes (no Navbar/Footer) */}
+        {/* Admin Routes */}
         <Route element={<PlainLayout />}>
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/add-car" element={<AddCars />} />
-          <Route path="/admin/list-cars" element={<ListCars />} />
+
+          {/* ✅ Protected Admin Routes */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/add-car"
+            element={
+              <AdminProtectedRoute>
+                <AddCars />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/list-cars"
+            element={
+              <AdminProtectedRoute>
+                <ListCars />
+              </AdminProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </>
