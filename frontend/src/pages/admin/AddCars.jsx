@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import AdminSidebar from "../../components/admin/AdminSidebar";
+import { useAdmin } from "../../context/AdminContext";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import axios from 'axios'
 
 const bodyOptions = [
   "SUV",
@@ -13,7 +17,7 @@ const bodyOptions = [
 
 const driveTrainOptions = ["FWD", "RWD", "AWD", "4x4"];
 const fuelOptionsList = ["Petrol", "Diesel", "CNG", "Electric", "Hybrid"];
-const transmissionOptions = ["CVT", "DSG", "DCT", "AMT","MT","TC"];
+const transmissionOptions = ["CVT", "DSG", "DCT", "AMT", "MT", "TC"];
 
 const AddCars = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +37,9 @@ const AddCars = () => {
 
   const [previewImages, setPreviewImages] = useState([]);
   const [engineTypes, setEngineTypes] = useState([""]);
+  const navigate = useNavigate();
 
+  const { addCar, loading } = useAdmin();
 
   const handleArrayChange = (field, index, value) => {
     const updated = [...formData[field]];
@@ -84,9 +90,38 @@ const AddCars = () => {
     setFormData({ ...formData, driveTrains: updated });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Car data submitted:", formData);
+
+    try {
+      await addCar(formData);
+      toast.success("Car uploaded successfully!");
+
+      // Reset form
+      setFormData({
+        company: "",
+        model: "",
+        price: { start: "", final: "" },
+        body: "",
+        fuelOptions: [],
+        driveTrains: [],
+        transmission: [],
+        colors: [""],
+        descriptions: "",
+        logo: null,
+        images: [],
+        spec: {},
+      });
+      setPreviewImages([]);
+
+      // Redirect after short delay (optional)
+      setTimeout(() => {
+        navigate("/admin/dashboard");
+      }, 1000);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to upload car. Check console.");
+    }
   };
 
   return (
@@ -268,50 +303,52 @@ const AddCars = () => {
 
           {/* --- Specs --- */}
           <div>
-  <label className="block font-semibold mb-2 text-gray-700">Engine Specifications</label>
+            <label className="block font-semibold mb-2 text-gray-700">
+              Engine Specifications
+            </label>
 
-  {engineTypes.map((type, idx) => (
-    <div key={idx} className="grid md:grid-cols-3 gap-4 mb-4">
-      <input
-        type="text"
-        placeholder="Engine Type (e.g. turboPetrol)"
-        className="input-style"
-        value={type}
-        onChange={(e) => {
-          const updatedTypes = [...engineTypes];
-          updatedTypes[idx] = e.target.value;
-          setEngineTypes(updatedTypes);
-        }}
-      />
+            {engineTypes.map((type, idx) => (
+              <div key={idx} className="grid md:grid-cols-3 gap-4 mb-4">
+                <input
+                  type="text"
+                  placeholder="Engine Type (e.g. turboPetrol)"
+                  className="input-style"
+                  value={type}
+                  onChange={(e) => {
+                    const updatedTypes = [...engineTypes];
+                    updatedTypes[idx] = e.target.value;
+                    setEngineTypes(updatedTypes);
+                  }}
+                />
 
-      <input
-        type="number"
-        placeholder="Power (e.g. 120)"
-        className="input-style"
-        onChange={(e) =>
-          handleSpecChange(engineTypes[idx], "power", e.target.value)
-        }
-      />
+                <input
+                  type="number"
+                  placeholder="Power (e.g. 120)"
+                  className="input-style"
+                  onChange={(e) =>
+                    handleSpecChange(engineTypes[idx], "power", e.target.value)
+                  }
+                />
 
-      <input
-        type="number"
-        placeholder="Torque (e.g. 170)"
-        className="input-style"
-        onChange={(e) =>
-          handleSpecChange(engineTypes[idx], "torque", e.target.value)
-        }
-      />
-    </div>
-  ))}
+                <input
+                  type="number"
+                  placeholder="Torque (e.g. 170)"
+                  className="input-style"
+                  onChange={(e) =>
+                    handleSpecChange(engineTypes[idx], "torque", e.target.value)
+                  }
+                />
+              </div>
+            ))}
 
-  <button
-    type="button"
-    onClick={() => setEngineTypes([...engineTypes, ""])}
-    className="mt-1 text-blue-600 text-sm hover:underline"
-  >
-    + Add More
-  </button>
-</div>
+            <button
+              type="button"
+              onClick={() => setEngineTypes([...engineTypes, ""])}
+              className="mt-1 text-blue-600 text-sm hover:underline"
+            >
+              + Add More
+            </button>
+          </div>
 
           {/* --- Upload Logo --- */}
           <div>
