@@ -7,7 +7,7 @@ const storage = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: "autosphere/cars",
-      allowed_formats: ["jpg", "png", "jpeg", "webp"],
+      allowed_formats: ["jpg", "png", "jpeg", "webp","avif"],
       public_id: `${Date.now()}-${file.originalname}`,
     };
   },

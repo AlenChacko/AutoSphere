@@ -1,4 +1,4 @@
-import handler from 'express-async-handler'
+import handler from "express-async-handler";
 import Car from "../../models/admin/carModel.js";
 
 export const addCars = handler(async (req, res) => {
@@ -16,11 +16,13 @@ export const addCars = handler(async (req, res) => {
     spec,
   } = req.body;
 
-  console.log("Adding...",req.body)
 
   // File uploads
   const logoFile = req.files?.logo?.[0];
   const imageFiles = req.files?.images || [];
+
+  console.log("🟡 req.body:", req.body);
+  console.log("🟡 req.files:", req.files);
 
   // Cloudinary/multer should provide 'path'
   const logoUrl = logoFile?.path || "";
@@ -69,3 +71,5 @@ export const addCars = handler(async (req, res) => {
 
   res.status(201).json({ message: "Car added successfully", car: newCar });
 });
+
+
