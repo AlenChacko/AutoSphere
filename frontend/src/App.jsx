@@ -19,6 +19,8 @@ import MainLayout from "./layouts/MainLayout";
 import PlainLayout from "./layouts/PlainLayout";
 
 import AdminProtectedRoute from "./layouts/AdminProtectedRoute"; 
+import EditCars from "./pages/admin/EditCars";
+import ViewCar from "./pages/admin/ViewCar";
 
 const App = () => {
   return (
@@ -70,6 +72,19 @@ const App = () => {
               </AdminProtectedRoute>
             }
           />
+           <Route
+            path="/admin/edit-car/:id"
+            element={
+              <AdminProtectedRoute>
+                <EditCars />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route path="/admin/view-car/:id" element={
+            <AdminProtectedRoute>
+                <ViewCar />
+              </AdminProtectedRoute>
+          } />
         </Route>
       </Routes>
     </>

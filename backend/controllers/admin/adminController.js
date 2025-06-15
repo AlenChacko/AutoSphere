@@ -235,3 +235,18 @@ export const deleteCar = handler(async (req, res) => {
 
   res.status(200).json({ message: "Car and its images deleted successfully" });
 });
+
+export const getCarById = async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.id);
+
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    res.status(200).json(car);
+  } catch (error) {
+    console.error("Error fetching car:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};

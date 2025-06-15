@@ -7,6 +7,7 @@ const AdminContext = createContext();
 export const AdminProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [cars, setCars] = useState([]);
+   const [selectedCar, setSelectedCar] = useState(null);
   const [admin, setAdmin] = useState(
     () => JSON.parse(localStorage.getItem("admin")) || null
   );
@@ -40,7 +41,7 @@ export const AdminProvider = ({ children }) => {
       formData.append("fuelOptions", JSON.stringify(formDataObj.fuelOptions));
       formData.append("driveTrains", JSON.stringify(formDataObj.driveTrains));
       formData.append(
-        "transmissions",
+        "transmission",
         JSON.stringify(formDataObj.transmissions)
       );
 
@@ -126,6 +127,29 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const fetchCarById = async (id) => {
+  setLoading(true);
+  try {
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/admin/car/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${admin?.token}`,
+        },
+      }
+    );
+    console.log("Selected Car from API:", data);
+    setSelectedCar(data);
+  } catch (error) {
+    console.error("Error fetching car by ID:", error.response?.data || error.message);
+    setSelectedCar(null);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
   return (
     <AdminContext.Provider
       value={{
@@ -135,6 +159,8 @@ export const AdminProvider = ({ children }) => {
         addCar,
         fetchCars,
         deleteCar,
+        fetchCarById,
+        selectedCar,
         loading,
         cars,
       }}

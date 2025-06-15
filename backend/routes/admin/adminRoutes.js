@@ -1,6 +1,11 @@
 import express from "express";
 import { loginAdmin } from "../../controllers/admin/loginController.js";
-import { addCars, deleteCar, getCars } from "../../controllers/admin/adminController.js";
+import {
+  addCars,
+  deleteCar,
+  getCarById,
+  getCars,
+} from "../../controllers/admin/adminController.js";
 import upload from "../../middlewares/multer.js";
 import adminAuth from "../../middlewares/adminAuth.js";
 
@@ -18,3 +23,4 @@ adminRouter.post(
 );
 adminRouter.get("/cars", adminAuth, getCars);
 adminRouter.delete("/delete-car/:id", adminAuth, deleteCar);
+adminRouter.get("/car/:id", adminAuth, getCarById);
