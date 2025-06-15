@@ -16,25 +16,33 @@ export const addCars = handler(async (req, res) => {
     spec,
   } = req.body;
 
+  // Extract files
+  const logoFile = req?.files?.logo?.[0];
+  const imageFiles = req?.files?.images || [];
 
-  // File uploads
-  const logoFile = req.files?.logo?.[0];
-  const imageFiles = req.files?.images || [];
-
-
-
-  // Cloudinary/multer should provide 'path'
   const logoUrl = logoFile?.path || "";
   const imageUrls = imageFiles.map((file) => file.path);
 
-  // Parse all expected JSON fields
-  const parsedFuelOptions = JSON.parse(fuelOptions || "[]");
-  const parsedDriveTrains = JSON.parse(driveTrains || "[]");
-  const parsedTransmission = JSON.parse(transmission || "[]");
-  const parsedColors = JSON.parse(colors || "[]");
-  const parsedSpec = JSON.parse(spec || "{}");
+  // Safely parse JSON fields
+  let parsedFuelOptions = [],
+    parsedDriveTrains = [],
+    parsedTransmission = [],
+    parsedColors = [],
+    parsedSpec = {};
+  try {
+    parsedFuelOptions = JSON.parse(fuelOptions || "[]");
+    parsedDriveTrains = JSON.parse(driveTrains || "[]");
+    parsedTransmission = JSON.parse(transmission || "[]");
+    parsedColors = JSON.parse(colors || "[]");
+    parsedSpec = JSON.parse(spec || "{}");
+  } catch (err) {
+    console.error("❌ JSON parsing error:", err);
+    return res
+      .status(400)
+      .json({ message: "Invalid JSON in form data", error: err.message });
+  }
 
-  // Validate required fields minimally
+  // Minimal validation
   if (
     !company ||
     !model ||
@@ -44,10 +52,11 @@ export const addCars = handler(async (req, res) => {
     parsedFuelOptions.length === 0 ||
     imageUrls.length === 0
   ) {
+    console.warn("⚠️ Missing required fields");
     return res.status(400).json({ message: "Missing required fields" });
   }
 
-  // Create new Car
+  // Construct new car document
   const newCar = new Car({
     company,
     model,
@@ -63,7 +72,7 @@ export const addCars = handler(async (req, res) => {
     descriptions,
     imageUrls,
     logoUrl,
-    spec: parsedSpec, // Map format supported
+    spec: parsedSpec,
   });
 
   await newCar.save();
@@ -72,3 +81,30 @@ export const addCars = handler(async (req, res) => {
 });
 
 
+export const getCars = handler(async (req, res) => {
+  const cars = await Car.find(); 
+  res.status(200).json(cars);
+});
+
+export const deleteCar = handler(async (req, res) => {
+  const { id } = req.params;
+  console.log("Received request to delete car with ID:", id);
+
+  try {
+    const car = await Car.findById(id);
+    console.log("Car found:", car);
+
+    if (!car) {
+      console.log("Car not found in the database");
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    await car.deleteOne();
+    console.log("Car deleted successfully");
+
+    res.status(200).json({ message: "Car deleted successfully" });
+  } catch (error) {
+    console.error("Error while deleting car:", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+});

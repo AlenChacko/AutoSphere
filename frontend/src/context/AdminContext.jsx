@@ -1,12 +1,12 @@
-import { createContext, useContext, useState, useEffect } from "react";
+// context/AdminContext.jsx
+import { createContext, useContext, useState } from "react";
 import axios from "axios";
+
 const AdminContext = createContext();
 
 export const AdminProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [cars, setCars] = useState([]);
-
-
   const [admin, setAdmin] = useState(() =>
     JSON.parse(localStorage.getItem("admin")) || null
   );
@@ -21,47 +21,114 @@ export const AdminProvider = ({ children }) => {
     localStorage.removeItem("admin");
   };
 
-   const addCar = async (formDataObject) => {
-    try {
-      setLoading(true);
+  const addCar = async (formDataObj) => {
+  try {
+    setLoading(true);
+    const formData = new FormData();
 
-      const formData = new FormData();
-      formData.append("company", formDataObject.company);
-      formData.append("model", formDataObject.model);
-      formData.append("priceStart", formDataObject.price.start);
-      formData.append("priceFinal", formDataObject.price.final);
-      formData.append("body", formDataObject.body);
-      formData.append("descriptions", formDataObject.descriptions);
+    // Append basic fields
+    formData.append("company", formDataObj.company);
+    formData.append("model", formDataObj.model);
+    formData.append("priceStart", formDataObj.price.start);
+    formData.append("priceFinal", formDataObj.price.final);
+    formData.append("body", formDataObj.body);
+    formData.append("descriptions", formDataObj.descriptions);
+    formData.append("spec", JSON.stringify(formDataObj.spec)); // ✅ object
 
-      formDataObject.colors.forEach((color) => formData.append("colors", color));
-      formDataObject.fuelOptions.forEach((fuel) => formData.append("fuelOptions", fuel));
-      formDataObject.driveTrains.forEach((d) => formData.append("driveTrains", d));
-      formDataObject.transmission.forEach((t) => formData.append("transmission", t));
+    // ✅ Stringify arrays before appending
+    formData.append("colors", JSON.stringify(formDataObj.colors));
+    formData.append("fuelOptions", JSON.stringify(formDataObj.fuelOptions));
+    formData.append("driveTrains", JSON.stringify(formDataObj.driveTrains));
+    formData.append("transmissions", JSON.stringify(formDataObj.transmissions));
 
-      formData.append("logo", formDataObject.logo);
-      formDataObject.images.forEach((img) => formData.append("images", img));
-
-      formData.append("spec", JSON.stringify(formDataObject.spec));
-
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/admin/add-cars`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-
-      // Optionally update local list
-      setCars((prev) => [...prev, res.data]);
-      return res.data;
-    } catch (err) {
-      console.error("Add car error:", err);
-      throw err;
-    } finally {
-      setLoading(false);
+    // Append files
+    if (formDataObj.logo) {
+      formData.append("logo", formDataObj.logo);
     }
-  };
+    formDataObj.images.forEach((img) => formData.append("images", img));
+
+    // Auth header
+    const storedAdmin = JSON.parse(localStorage.getItem("admin"));
+    const token = storedAdmin?.token;
+    if (!token) throw new Error("Admin is not authenticated");
+
+    const res = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/admin/add-cars`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setCars((prev) => [...prev, res.data]);
+    return res.data;
+  } catch (err) {
+    console.error("Add car error:", err);
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
+
+const fetchCars = async () => {
+  try {
+    setLoading(true);
+    const storedAdmin = JSON.parse(localStorage.getItem("admin"));
+    const token = storedAdmin?.token;
+    if (!token) throw new Error("Admin is not authenticated");
+
+    const res = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/admin/cars`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setCars(res.data);
+  } catch (err) {
+    console.error("Fetch cars error:", err);
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
+
+const deleteCar = async (carId) => {
+  try {
+    setLoading(true);
+
+    const admin = JSON.parse(localStorage.getItem("admin")); // ✅ parse the stored admin object
+    const token = admin?.token;
+
+    await axios.delete(
+      `${import.meta.env.VITE_BACKEND_URL}/api/admin/delete-car/${carId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setCars((prev) => prev.filter((car) => car._id !== carId));
+  } catch (err) {
+    console.error("Delete car error:", err);
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
-    <AdminContext.Provider value={{ admin, loginAdmin, logoutAdmin,addCar, loading, cars  }}>
+    <AdminContext.Provider
+      value={{ admin, loginAdmin, logoutAdmin, addCar,fetchCars,deleteCar, loading, cars }}
+    >
       {children}
     </AdminContext.Provider>
   );

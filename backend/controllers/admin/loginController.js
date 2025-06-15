@@ -9,9 +9,12 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     throw new Error("Email and password are required");
   }
 
-  if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+  if (
+    email === process.env.ADMIN_EMAIL &&
+    password === process.env.ADMIN_PASSWORD
+  ) {
     const token = jwt.sign({ role: "admin" }, process.env.ADMIN_JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "30d",
     });
     return res.status(200).json({ token });
   }
