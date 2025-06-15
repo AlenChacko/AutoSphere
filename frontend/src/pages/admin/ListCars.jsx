@@ -5,23 +5,23 @@ import { useAdmin } from "../../context/AdminContext";
 import { toast } from "react-toastify";
 
 const ListCars = () => {
-  const { cars, fetchCars, loading,deleteCar } = useAdmin();
+  const { cars, fetchCars, loading, deleteCar } = useAdmin();
 
   useEffect(() => {
     fetchCars();
   }, []);
 
   const handleDelete = async (id) => {
-  const confirm = window.confirm("Are you sure you want to delete this car?");
-  if (!confirm) return;
+    const confirm = window.confirm("Are you sure you want to delete this car?");
+    if (!confirm) return;
 
-  try {
-    await deleteCar(id);
-    toast.success("Car deleted successfully");
-  } catch (err) {
-    toast.error("Failed to delete car");
-  }
-};
+    try {
+      await deleteCar(id);
+      toast.success("Car deleted successfully");
+    } catch (err) {
+      toast.error("Failed to delete car");
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -63,11 +63,11 @@ const ListCars = () => {
                     Edit
                   </Link>
                   <button
-  onClick={() => handleDelete(car._id)}
-  className="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
->
-  Delete
-</button>
+                    onClick={() => handleDelete(car._id)}
+                    className="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}

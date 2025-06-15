@@ -1,3 +1,4 @@
+import { v2 as cloudinary } from "cloudinary";
 import handler from "express-async-handler";
 import Car from "../../models/admin/carModel.js";
 
@@ -88,23 +89,30 @@ export const getCars = handler(async (req, res) => {
 
 export const deleteCar = handler(async (req, res) => {
   const { id } = req.params;
-  console.log("Received request to delete car with ID:", id);
+  console.log("Deleting car with ID:", id);
 
-  try {
-    const car = await Car.findById(id);
-    console.log("Car found:", car);
-
-    if (!car) {
-      console.log("Car not found in the database");
-      return res.status(404).json({ message: "Car not found" });
-    }
-
-    await car.deleteOne();
-    console.log("Car deleted successfully");
-
-    res.status(200).json({ message: "Car deleted successfully" });
-  } catch (error) {
-    console.error("Error while deleting car:", error.message);
-    res.status(500).json({ message: "Server Error" });
+  const car = await Car.findById(id);
+  if (!car) {
+    console.log("Car not found");
+    return res.status(404).json({ message: "Car not found" });
   }
+
+  // Delete images from Cloudinary
+  if (car.images && car.images.length > 0) {
+    for (const image of car.images) {
+      try {
+        // If `image` is an object with public_id, use that
+        const publicId = image.public_id || image; // handle both formats
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log(`Deleted image ${publicId} from Cloudinary:`, result);
+      } catch (err) {
+        console.error(`Failed to delete image ${image} from Cloudinary:`, err.message);
+      }
+    }
+  }
+
+  await car.deleteOne();
+  console.log("Car deleted successfully");
+
+  res.status(200).json({ message: "Car deleted successfully" });
 });

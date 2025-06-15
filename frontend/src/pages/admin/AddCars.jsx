@@ -77,7 +77,7 @@ const AddCars2 = () => {
     try {
       await addCar(formData);
       toast.success("Car added successfully!");
-      navigate("/admin/dashboard");
+      navigate("/admin/list-cars");
     } catch {
       toast.error("Failed to add car.");
     }
