@@ -13,9 +13,19 @@ const carSchema = new mongoose.Schema(
     driveTrains: [{ type: String }],
     transmission: [{ type: String }],
     colors: [{ type: String }],
-    imageUrls: [{ type: String }],
-    logoUrl: { type: String },      
-    descriptions: { type: String }, 
+    descriptions: { type: String },
+
+    logo: {
+      public_id: { type: String },
+      url: { type: String },
+    },
+    images: [
+      {
+        public_id: String,
+        url: String,
+      },
+    ],
+
     spec: {
       type: Map,
       of: new mongoose.Schema({
@@ -23,10 +33,11 @@ const carSchema = new mongoose.Schema(
         torque: String,
       }),
       default: {},
-    }, 
+    },
   },
   { timestamps: true }
 );
+
 
 const Car = mongoose.model("Car", carSchema);
 export default Car;

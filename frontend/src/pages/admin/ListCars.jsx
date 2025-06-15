@@ -41,7 +41,7 @@ const ListCars = () => {
                 className="bg-white rounded-lg shadow-md p-5 flex flex-col items-center text-center"
               >
                 <img
-                  src={car.imageUrls?.[0]}
+                  src={car.images?.[0]?.url || "/fallback-car.jpg"} // add fallback if needed
                   alt={`${car.company} ${car.model}`}
                   className="w-full h-40 object-cover rounded-md mb-3"
                 />

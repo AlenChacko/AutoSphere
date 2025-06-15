@@ -7,9 +7,10 @@ import { useAdmin } from "../../context/AdminContext";
 
 const OPTIONS = {
   bodyTypes: [
-    "SUV",
+    "Mini SUV",
     "Compact SUV",
-    "Sub 4mtr SUV",
+    "Full Size SUV",
+    "Coupe",
     "Sedan",
     "MPV",
     "Hatchback",
@@ -20,7 +21,7 @@ const OPTIONS = {
   transmissions: ["CVT", "DSG", "DCT", "AMT", "MT", "TC"],
 };
 
-const AddCars2 = () => {
+const AddCars = () => {
   const navigate = useNavigate();
   const { addCar } = useAdmin();
 
@@ -291,4 +292,4 @@ const AddCars2 = () => {
   );
 };
 
-export default AddCars2;
+export default AddCars;
