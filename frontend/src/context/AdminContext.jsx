@@ -23,57 +23,56 @@ export const AdminProvider = ({ children }) => {
   };
 
   const addCar = async (formDataObj) => {
-  try {
-    setLoading(true);
-    const formData = new FormData();
+    try {
+      setLoading(true);
+      const formData = new FormData();
 
-    // Append basic fields
-    formData.append("company", formDataObj.company);
-    formData.append("model", formDataObj.model);
-    formData.append("priceStart", formDataObj.price.start);
-    formData.append("priceFinal", formDataObj.price.final);
-    formData.append("body", formDataObj.body);
-    formData.append("descriptions", formDataObj.descriptions);
-    formData.append("spec", JSON.stringify(formDataObj.spec)); // object
+      // Append basic fields
+      formData.append("company", formDataObj.company);
+      formData.append("model", formDataObj.model);
+      formData.append("priceStart", formDataObj.price.start);
+      formData.append("priceFinal", formDataObj.price.final);
+      formData.append("body", formDataObj.body);
+      formData.append("descriptions", formDataObj.descriptions);
+      formData.append("spec", JSON.stringify(formDataObj.spec)); // object
 
-    // ✅ Stringify arrays before appending
-    formData.append("colors", JSON.stringify(formDataObj.colors));
-    formData.append("fuelOptions", JSON.stringify(formDataObj.fuelOptions));
-    formData.append("driveTrains", JSON.stringify(formDataObj.driveTrains));
-    formData.append("transmission", JSON.stringify(formDataObj.transmission)); // ✅ FIXED: renamed from transmissions
+      // ✅ Stringify arrays before appending
+      formData.append("colors", JSON.stringify(formDataObj.colors));
+      formData.append("fuelOptions", JSON.stringify(formDataObj.fuelOptions));
+      formData.append("driveTrains", JSON.stringify(formDataObj.driveTrains));
+      formData.append("transmission", JSON.stringify(formDataObj.transmission)); // ✅ FIXED: renamed from transmissions
 
-    // Append files
-    if (formDataObj.logo) {
-      formData.append("logo", formDataObj.logo);
-    }
-    formDataObj.images.forEach((img) => formData.append("images", img));
-
-    // Auth header
-    const storedAdmin = JSON.parse(localStorage.getItem("admin"));
-    const token = storedAdmin?.token;
-    if (!token) throw new Error("Admin is not authenticated");
-
-    const res = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/admin/add-cars`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
+      // Append files
+      if (formDataObj.logo) {
+        formData.append("logo", formDataObj.logo);
       }
-    );
+      formDataObj.images.forEach((img) => formData.append("images", img));
 
-    setCars((prev) => [...prev, res.data.car]); // ⬅️ Note: `res.data.car`, not entire response
-    return res.data.car;
-  } catch (err) {
-    console.error("Add car error:", err);
-    throw err;
-  } finally {
-    setLoading(false);
-  }
-};
+      // Auth header
+      const storedAdmin = JSON.parse(localStorage.getItem("admin"));
+      const token = storedAdmin?.token;
+      if (!token) throw new Error("Admin is not authenticated");
 
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/add-cars`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setCars((prev) => [...prev, res.data.car]); // ⬅️ Note: `res.data.car`, not entire response
+      return res.data.car;
+    } catch (err) {
+      console.error("Add car error:", err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchCars = async () => {
     try {
@@ -149,56 +148,56 @@ export const AdminProvider = ({ children }) => {
   };
 
   const updateCar = async (id, formDataObj) => {
-  try {
-    setLoading(true);
-    const formData = new FormData();
+    try {
+      setLoading(true);
+      const formData = new FormData();
 
-    // Basic Fields
-    formData.append("company", formDataObj.company);
-    formData.append("model", formDataObj.model);
-    formData.append("priceStart", formDataObj.price.start);
-    formData.append("priceFinal", formDataObj.price.final);
-    formData.append("body", formDataObj.body);
-    formData.append("descriptions", formDataObj.descriptions);
+      // Basic Fields
+      formData.append("company", formDataObj.company);
+      formData.append("model", formDataObj.model);
+      formData.append("priceStart", formDataObj.price.start);
+      formData.append("priceFinal", formDataObj.price.final);
+      formData.append("body", formDataObj.body);
+      formData.append("descriptions", formDataObj.descriptions);
 
-    // JSON fields
-    formData.append("spec", JSON.stringify(formDataObj.spec));
-    formData.append("colors", JSON.stringify(formDataObj.colors));
-    formData.append("fuelOptions", JSON.stringify(formDataObj.fuelOptions));
-    formData.append("driveTrains", JSON.stringify(formDataObj.driveTrains));
-    formData.append("transmission", JSON.stringify(formDataObj.transmission)); // ✅ FIXED
+      // JSON fields
+      formData.append("spec", JSON.stringify(formDataObj.spec));
+      formData.append("colors", JSON.stringify(formDataObj.colors));
+      formData.append("fuelOptions", JSON.stringify(formDataObj.fuelOptions));
+      formData.append("driveTrains", JSON.stringify(formDataObj.driveTrains));
+      formData.append("transmission", JSON.stringify(formDataObj.transmission)); // ✅ FIXED
 
-    // Files
-    if (formDataObj.logo) {
-      formData.append("logo", formDataObj.logo);
-    }
-    formDataObj.images.forEach((img) => formData.append("images", img));
-
-    // Auth
-    const storedAdmin = JSON.parse(localStorage.getItem("admin"));
-    const token = storedAdmin?.token;
-    if (!token) throw new Error("Admin is not authenticated");
-
-    // API Call
-    const { data } = await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/api/admin/update-car/${id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
+      // Files
+      if (formDataObj.logo) {
+        formData.append("logo", formDataObj.logo);
       }
-    );
+      formDataObj.images.forEach((img) => formData.append("images", img));
 
-    return data;
-  } catch (error) {
-    console.error("Update car error:", error);
-    throw error;
-  } finally {
-    setLoading(false);
-  }
-};
+      // Auth
+      const storedAdmin = JSON.parse(localStorage.getItem("admin"));
+      const token = storedAdmin?.token;
+      if (!token) throw new Error("Admin is not authenticated");
+
+      // API Call
+      const { data } = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/update-car/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return data;
+    } catch (error) {
+      console.error("Update car error:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <AdminContext.Provider

@@ -10,15 +10,18 @@ const OPTIONS = {
     "Mini SUV",
     "Compact SUV",
     "Full Size SUV",
+    "Coupe SUV",
     "Coupe",
     "Sedan",
+    "Compact Sedan",
     "MPV",
     "Hatchback",
+    "Pick-up Truck",
     "Others",
   ],
   driveTrains: ["FWD", "RWD", "AWD", "4x4"],
   fuelOptions: ["Petrol", "Diesel", "CNG", "Electric", "Hybrid"],
-  transmission: ["CVT", "DSG", "DCT", "AMT", "MT", "TC"],
+  transmission: ["CVT", "DSG", "DCT", "AMT", "MT", "TC","AT"], 
 };
 
 const EditCars = () => {

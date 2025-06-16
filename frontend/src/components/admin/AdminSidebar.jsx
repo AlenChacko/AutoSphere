@@ -48,13 +48,7 @@ const AdminSidebar = () => {
           <span>Add Cars</span>
         </Link>
 
-        <Link
-          to="/admin/edit-car"
-          className={getLinkClasses("/admin/edit-car")}
-        >
-          <FaEdit />
-          <span>Edit Cars</span>
-        </Link>
+       
 
         <Link
           to="/admin/list-cars"
