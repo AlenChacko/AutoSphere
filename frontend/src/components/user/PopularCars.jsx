@@ -1,22 +1,23 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { cars } from "../../assets/cars";
+import { useUser } from "../../context/UserContext";
 
 const PopularCars = () => {
-  const basePopularCars = cars.filter(
-    (car) => car.price.start >= 5 && car.price.start <= 15
-  );
+  const { popularCars, loadingCars, errorCars } = useUser();
 
   const [showAll, setShowAll] = useState(false);
   const [sortOrder, setSortOrder] = useState("default");
 
-  const sortedCars = [...basePopularCars].sort((a, b) => {
+  const sortedCars = [...popularCars].sort((a, b) => {
     if (sortOrder === "lowToHigh") return a.price.start - b.price.start;
     if (sortOrder === "highToLow") return b.price.start - a.price.start;
-    return 0; // default order
+    return 0;
   });
 
   const displayedCars = showAll ? sortedCars : sortedCars.slice(0, 8);
+
+  if (loadingCars) return <p className="px-6 py-10">Loading cars...</p>;
+  if (errorCars) return <p className="px-6 py-10 text-red-500">{errorCars}</p>;
 
   return (
     <div className="px-6 py-10 bg-gray-50">
@@ -36,14 +37,14 @@ const PopularCars = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {displayedCars.map((car, idx) => (
+        {displayedCars.map((car) => (
           <Link
             to={`/car/${encodeURIComponent(car.company)}/${encodeURIComponent(car.model)}`}
-            key={idx}
+            key={car._id}
             className="bg-white rounded-xl shadow hover:shadow-md transition duration-300 overflow-hidden"
           >
             <img
-              src={car.images[0]}
+              src={car.images?.[0]?.url || "/fallback-car.jpg"}
               alt={car.model}
               className="w-full h-48 object-cover"
             />
@@ -59,7 +60,7 @@ const PopularCars = () => {
         ))}
       </div>
 
-      {basePopularCars.length > 8 && (
+      {popularCars.length > 8 && (
         <div className="text-center mt-8">
           <button
             onClick={() => setShowAll(!showAll)}
