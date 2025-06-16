@@ -1,13 +1,24 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { cars } from "../../assets/cars";
+import { useUser } from "../../context/UserContext";
 
 const Cars = () => {
   const { brand } = useParams();
+  const { cars, loadingCars, errorCars } = useUser();
   const [sortOrder, setSortOrder] = useState("default");
 
   if (!brand) {
     return <div className="text-center text-red-500">Brand not specified.</div>;
+  }
+
+  if (loadingCars) {
+    return (
+      <div className="text-center text-gray-500 py-10">Loading cars...</div>
+    );
+  }
+
+  if (errorCars) {
+    return <div className="text-center text-red-600 py-10">{errorCars}</div>;
   }
 
   let filteredCars = cars.filter(
@@ -22,7 +33,7 @@ const Cars = () => {
     );
   }
 
-  // Apply sorting based on selected order
+  // Apply sorting
   if (sortOrder === "lowToHigh") {
     filteredCars.sort((a, b) => a.price.start - b.price.start);
   } else if (sortOrder === "highToLow") {
@@ -33,14 +44,16 @@ const Cars = () => {
     <div className="px-6 py-10">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div className="flex items-center gap-3">
-          {filteredCars[0]?.logo && (
+          {filteredCars[0]?.logo?.url && (
             <img
-              src={filteredCars[0].logo}
+              src={filteredCars[0].logo.url}
               alt={`${brand} logo`}
               className="h-8 w-auto object-contain"
             />
           )}
-          <h2 className="text-3xl font-semibold text-gray-800">{brand}</h2>
+          <h2 className="text-3xl font-semibold text-gray-800 capitalize">
+            {brand}
+          </h2>
         </div>
 
         <select
@@ -64,7 +77,7 @@ const Cars = () => {
           >
             <div className="bg-white p-4 rounded shadow hover:shadow-lg transition cursor-pointer">
               <img
-                src={car.images[0]}
+                src={car.images?.[0]?.url || "/fallback-car.jpg"}
                 alt={car.model}
                 className="w-full h-48 object-cover rounded mb-4"
               />
