@@ -5,6 +5,7 @@ import {
   deleteCar,
   getCarById,
   getCars,
+  updateCar,
 } from "../../controllers/admin/adminController.js";
 import upload from "../../middlewares/multer.js";
 import adminAuth from "../../middlewares/adminAuth.js";
@@ -24,3 +25,12 @@ adminRouter.post(
 adminRouter.get("/cars", adminAuth, getCars);
 adminRouter.delete("/delete-car/:id", adminAuth, deleteCar);
 adminRouter.get("/car/:id", adminAuth, getCarById);
+adminRouter.put(
+  "/update-car/:id",
+  adminAuth,
+  upload.fields([
+    { name: "logo", maxCount: 1 },
+    { name: "images", maxCount: 5 },
+  ]),
+  updateCar
+);

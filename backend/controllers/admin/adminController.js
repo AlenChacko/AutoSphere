@@ -250,3 +250,68 @@ export const getCarById = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+export const updateCar = handler(async (req, res) => {
+  const { id } = req.params;
+  const {
+    company,
+    model,
+    priceStart,
+    priceFinal,
+    body,
+    fuelOptions,
+    driveTrains,
+    transmission,
+    colors,
+    descriptions,
+    spec,
+  } = req.body;
+
+  const car = await Car.findById(id);
+  if (!car) {
+    return res.status(404).json({ message: "Car not found" });
+  }
+
+  // Update basic fields
+  car.company = company;
+  car.model = model;
+  car.price = { start: priceStart, final: priceFinal };
+  car.body = body;
+  car.fuelOptions = fuelOptions ? JSON.parse(fuelOptions) : [];
+  car.driveTrains = driveTrains ? JSON.parse(driveTrains) : [];
+ car.transmission = transmission ? JSON.parse(transmission) : [];
+  car.colors = colors ? JSON.parse(colors) : [];
+ car.descriptions = descriptions || "";
+  car.spec = spec ? JSON.parse(spec) : [];
+
+  // Handle logo
+  const logoFile = req?.files?.logo?.[0];
+  if (logoFile) {
+    // delete old logo from Cloudinary
+    if (car.logo?.public_id) {
+      await deleteFromCloudinary(car.logo.public_id);
+    }
+
+    const logoResult = await uploadToCloudinary(logoFile.path, "car-logos");
+    car.logo = { url: logoResult.secure_url, public_id: logoResult.public_id };
+  }
+
+  // Handle images
+  const newImages = req?.files?.images || [];
+  if (newImages.length > 0) {
+    // delete old images
+    for (const img of car.images) {
+      if (img.public_id) await deleteFromCloudinary(img.public_id);
+    }
+
+    const uploadedImages = [];
+    for (const img of newImages) {
+      const result = await uploadToCloudinary(img.path, "car-images");
+      uploadedImages.push({ url: result.secure_url, public_id: result.public_id });
+    }
+    car.images = uploadedImages;
+  }
+
+  await car.save();
+  res.status(200).json({ message: "Car updated successfully", car });
+});

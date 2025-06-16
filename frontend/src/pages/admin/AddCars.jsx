@@ -1,4 +1,3 @@
-// pages/admin/AddCars.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/admin/AdminSidebar";
@@ -18,7 +17,7 @@ const OPTIONS = {
   ],
   driveTrains: ["FWD", "RWD", "AWD", "4x4"],
   fuelOptions: ["Petrol", "Diesel", "CNG", "Electric", "Hybrid"],
-  transmissions: ["CVT", "DSG", "DCT", "AMT", "MT", "TC"],
+  transmission: ["CVT", "DSG", "DCT", "AMT", "MT", "TC"], // ✅ fixed key
 };
 
 const AddCars = () => {
@@ -32,7 +31,7 @@ const AddCars = () => {
     body: "",
     fuelOptions: [],
     driveTrains: [],
-    transmissions: [],
+    transmission: [], // ✅ renamed from transmissions
     colors: [""],
     descriptions: "",
     logo: null,
@@ -161,7 +160,7 @@ const AddCars = () => {
           />
 
           {/* Checkbox Groups */}
-          {["fuelOptions", "driveTrains", "transmissions"].map((field) => (
+          {["fuelOptions", "driveTrains", "transmission"].map((field) => (
             <div key={field}>
               <label className="block font-semibold mb-2 text-gray-700 capitalize">
                 {field.replace(/([A-Z])/g, " $1")}
