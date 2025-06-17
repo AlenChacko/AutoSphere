@@ -41,10 +41,16 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 text-lg">
-          <Link to="/new-cars" className="text-gray-700 hover:text-blue-600 font-medium">
+          <Link
+            to="/new-cars"
+            className="text-gray-700 hover:text-blue-600 font-medium"
+          >
             New Cars
           </Link>
-          <Link to="/used-cars" className="text-gray-700 hover:text-blue-600 font-medium">
+          <Link
+            to="/used-cars"
+            className="text-gray-700 hover:text-blue-600 font-medium"
+          >
             Used Cars
           </Link>
 
@@ -59,10 +65,16 @@ const Navbar = () => {
             </button>
           </div>
 
-          <Link to="/contact" className="text-gray-700 hover:text-blue-600 font-medium">
+          <Link
+            to="/contact"
+            className="text-gray-700 hover:text-blue-600 font-medium"
+          >
             Contact
           </Link>
-          <Link to="/about" className="text-gray-700 hover:text-blue-600 font-medium">
+          <Link
+            to="/about"
+            className="text-gray-700 hover:text-blue-600 font-medium"
+          >
             About
           </Link>
 
@@ -80,7 +92,7 @@ const Navbar = () => {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
                   <Link
                     to="/profile"
                     className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
@@ -92,6 +104,12 @@ const Navbar = () => {
                     className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
                   >
                     Wishlist
+                  </Link>
+                  <Link
+                    to="/sell"
+                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+                  >
+                    Sell Your Car
                   </Link>
                   <button
                     onClick={handleLogout}
@@ -116,35 +134,68 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden mt-4 space-y-4">
-          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-            <input
-              type="text"
-              placeholder="Search cars..."
-              className="px-4 py-2 outline-none text-sm w-full"
-            />
-            <button className="bg-blue-600 p-2 text-white">
-              <FaSearch />
-            </button>
-          </div>
+          <div className="space-y-1">
+            <Link
+              to="/new-cars"
+              className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
+            >
+              New Cars
+            </Link>
+            <Link
+              to="/used-cars"
+              className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
+            >
+              Used Cars
+            </Link>
 
-          <div className="space-y-1 border-t pt-3">
             {user ? (
-              <>
-                <Link to="/profile" className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700">
-                  Profile
-                </Link>
-                <Link to="/wishlist" className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700">
-                  Wishlist
-                </Link>
+              <div className="relative">
+                {/* Profile Toggle Button */}
                 <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-2 py-1 hover:bg-gray-100 text-sm text-red-700"
+                  onClick={toggleDropdown}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-gray-700 hover:text-blue-600 w-full"
                 >
-                  Logout
+                  <FaUserCircle size={20} />
+                  <span>
+                    {user.firstName} {user.lastName}
+                  </span>
                 </button>
-              </>
+
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="mt-2 ml-4 space-y-1">
+                    <Link
+                      to="/profile"
+                      className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      to="/wishlist"
+                      className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
+                    >
+                      Wishlist
+                    </Link>
+                    <Link
+                      to="/sell"
+                      className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
+                    >
+                      Sell Your Car
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-2 py-1 hover:bg-gray-100 text-sm text-red-700"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
-              <Link to="/auth" className="block px-2 py-1 hover:bg-gray-100 text-sm text-blue-700">
+              <Link
+                to="/auth"
+                className="block px-2 py-1 hover:bg-gray-100 text-sm text-blue-700"
+              >
                 Login
               </Link>
             )}
