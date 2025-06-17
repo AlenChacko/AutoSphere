@@ -1,19 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiEdit } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import profile from "../../assets/images/other/profile.avif";
 import { useUser } from "../../context/UserContext";
-import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 const ProfilePage = () => {
-  const { userInfo, loadingUser } = useUser();
+  const { userInfo, loadingUser, updateUserProfile } = useUser();
+
+  useEffect(()=>{
+    console.log('userinfi',userInfo)
+  })
 
   const [profileImage, setProfileImage] = useState(null);
+  const [profileFile, setProfileFile] = useState(null); // To store actual file for upload
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    location: "",
+    location: {
+      state: "",
+      district: "",
+      pin: "",
+    },
     phone: "",
   });
 
@@ -21,7 +30,11 @@ const ProfilePage = () => {
     firstName: false,
     lastName: false,
     email: false,
-    location: false,
+    location: {
+      state: false,
+      district: false,
+      pin: false,
+    },
     phone: false,
   });
 
@@ -32,12 +45,11 @@ const ProfilePage = () => {
         lastName: userInfo.lastName || "",
         email: userInfo.email || "",
         phone: userInfo.phone || "",
-        location:
-          userInfo.location?.state ||
-          userInfo.location?.district ||
-          userInfo.location?.pin
-            ? `${userInfo.location?.district || ""}, ${userInfo.location?.state || ""} - ${userInfo.location?.pin || ""}`
-            : "",
+        location: {
+          state: userInfo.location?.state || "",
+          district: userInfo.location?.district || "",
+          pin: userInfo.location?.pin || "",
+        },
       });
 
       if (userInfo.profilePic) {
@@ -49,22 +61,62 @@ const ProfilePage = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setProfileFile(file);
       setProfileImage(URL.createObjectURL(file));
     }
   };
 
   const handleInputChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+
+    if (name.startsWith("location.")) {
+      const key = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          [key]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const toggleEdit = (field) => {
-    setEditableFields((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
+    if (field.startsWith("location.")) {
+      const key = field.split(".")[1];
+      setEditableFields((prev) => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          [key]: !prev.location[key],
+        },
+      }));
+    } else {
+      setEditableFields((prev) => ({
+        ...prev,
+        [field]: !prev[field],
+      }));
+    }
+  };
+
+  const handleProfileUpdate = async () => {
+    const formPayload = {
+      ...formData,
+      profilePic: profileFile || null,
+    };
+
+    const result = await updateUserProfile(formPayload);
+
+    if (result.success) {
+      toast.success("Profile updated successfully!");
+    } else {
+      toast.error(result.message || "Profile update failed");
+    }
   };
 
   if (loadingUser) return <div className="text-center py-10">Loading...</div>;
@@ -96,7 +148,6 @@ const ProfilePage = () => {
           </h2>
           <p className="text-gray-500">{formData.email}</p>
 
-          {/* Navigation Buttons */}
           <div className="mt-4 flex flex-wrap gap-3 justify-center md:justify-start">
             <Link
               to="/wishlist"
@@ -153,14 +204,15 @@ const ProfilePage = () => {
           ))}
         </div>
 
-        {/* Other Inputs */}
-        {["email", "location", "phone"].map((field) => (
+        {/* Email and Phone Inputs */}
+        {["email", "phone"].map((field) => (
           <div key={field} className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
               {field}
             </label>
             <input
-              type="text"
+
+              type={field === "email" ? "email" : "number"}
               name={field}
               value={formData[field]}
               disabled={!editableFields[field]}
@@ -178,8 +230,43 @@ const ProfilePage = () => {
           </div>
         ))}
 
+        {/* Location Inputs */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {["state", "district", "pin"].map((field) => (
+            <div key={field} className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
+                {field}
+              </label>
+              <input
+                type={field === "pin" ? "number" : "text"}
+                name={`location.${field}`}
+                value={formData.location[field]}
+                disabled={!editableFields.location[field]}
+                onChange={handleInputChange}
+                className={`w-full border rounded-lg px-4 py-2 text-sm ${
+                  editableFields.location[field]
+                    ? "border-blue-500 focus:ring-2 focus:ring-blue-500"
+                    : "border-gray-300 bg-gray-100"
+                }`}
+              />
+              <FiEdit
+                className="absolute top-9 right-3 text-gray-500 cursor-pointer"
+                onClick={() => toggleEdit(`location.${field}`)}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Save Changes Button */}
+        <button
+          onClick={handleProfileUpdate}
+          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Save Changes
+        </button>
+
         {/* Reset Password */}
-        <button className="mt-4 w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition">
+        <button className="w-full mt-2 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition">
           Reset Password
         </button>
       </div>

@@ -5,7 +5,6 @@ import User from "../../models/user/userModel.js";
 import { generateToken } from "../../utils/generateToken.js";
 
 export const registerUser = handler(async (req, res) => {
-
   const { firstName, lastName, email, password } = req.body;
 
   if (!firstName || !lastName || !email || !password) {
@@ -14,7 +13,7 @@ export const registerUser = handler(async (req, res) => {
   }
 
   const existingUser = await User.findOne({ email });
-  
+
   if (existingUser) {
     res.status(409);
     throw new Error("This email already registered");
@@ -74,12 +73,11 @@ export const loginUser = handler(async (req, res) => {
     success: true,
     message: "Login successful",
     user: {
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        token: generateToken(user._id),
-      },
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      token: generateToken(user._id),
+    },
   });
 });
-

@@ -81,6 +81,47 @@ export const UserProvider = ({ children }) => {
     fetchUserInfo();
   }, []);
 
+  const updateUserProfile = async (formDataObj) => {
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const token = storedUser?.token;
+
+    if (!token) throw new Error("No token");
+
+    const formData = new FormData();
+
+    // Append fields
+    for (const key in formDataObj) {
+      if (key === "location") {
+        for (const locKey in formDataObj.location) {
+          formData.append(locKey, formDataObj.location[locKey]);
+        }
+      } else if (key === "profilePic" && formDataObj.profilePic instanceof File) {
+        formData.append("profilePic", formDataObj.profilePic);
+      } else {
+        formData.append(key, formDataObj[key]);
+      }
+    }
+
+    await axios.patch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/update`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    await fetchUserInfo(); // Refresh updated data
+    return { success: true };
+  } catch (err) {
+    console.error("Profile update failed", err);
+    return { success: false, message: err.response?.data?.message || "Update failed" };
+  }
+};
+
   return (
     <UserContext.Provider
       value={{
@@ -94,6 +135,7 @@ export const UserProvider = ({ children }) => {
         userInfo,
         loadingUser,
         fetchUserInfo,
+        updateUserProfile,
       }}
     >
       {children}

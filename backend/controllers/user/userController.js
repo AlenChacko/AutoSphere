@@ -22,3 +22,44 @@ export const getUserInfo = handler(async (req, res) => {
 
   res.status(200).json(user);
 });
+
+export const updateProfile = handler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const { firstName, lastName, email, phone, state, district, pin } = req.body;
+
+  // Update basic fields
+  if (firstName) user.firstName = firstName;
+  if (lastName) user.lastName = lastName;
+  if (email) user.email = email;
+  if (phone) user.phone = phone;
+
+  // Update location if provided
+  user.location = {
+    state: state || user.location?.state || "",
+    district: district || user.location?.district || "",
+    pin: pin || user.location?.pin || "",
+  };
+
+  // Update profile image if uploaded
+  if (req.file && req.file.path) {
+    user.profilePic = req.file.path; // multer-storage-cloudinary attaches `path`
+  }
+
+  const updatedUser = await user.save();
+
+  res.status(200).json({
+    _id: updatedUser._id,
+    firstName: updatedUser.firstName,
+    lastName: updatedUser.lastName,
+    email: updatedUser.email,
+    phone: updatedUser.phone,
+    location: updatedUser.location,
+    profilePic: updatedUser.profilePic,
+  });
+});

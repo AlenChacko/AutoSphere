@@ -2,17 +2,35 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../utils/cloudinary.js";
 
-const storage = new CloudinaryStorage({
+// 🚗 Storage for car images
+const carStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
     return {
       folder: "autosphere/cars",
-      allowed_formats: ["jpg", "png", "jpeg", "webp","avif"],
+      allowed_formats: ["jpg", "png", "jpeg", "webp", "avif"],
       public_id: `${Date.now()}-${file.originalname}`,
     };
   },
 });
 
-const upload = multer({ storage });
+const uploadCar = multer({ storage: carStorage });
 
-export default upload;
+
+// 👤 Storage for profile pictures
+const profileStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: "autosphere/profiles",
+      allowed_formats: ["jpg", "png", "jpeg", "webp", "avif"],
+      public_id: `${Date.now()}-${file.originalname}`,
+    };
+  },
+});
+
+const uploadProfile = multer({ storage: profileStorage });
+
+
+// ✅ Export both uploaders
+export { uploadCar, uploadProfile };
