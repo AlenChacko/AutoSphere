@@ -27,8 +27,20 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
     location: {
-      type: String,
-      default: "",
+      state: {
+        type: String,
+        trim: true,
+        default: "",
+      },
+      district: {
+        type: String,
+        trim: true,
+        default: "",
+      },
+      pin: {
+        type: Number,
+        default: null,
+      },
     },
     profilePic: {
       type: String,

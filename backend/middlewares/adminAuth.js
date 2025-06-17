@@ -9,11 +9,11 @@ const adminAuth = (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1];
-  console.log("Received Token:", token); // ✅ Log token for debugging
+ 
 
   try {
     const decoded = jwt.verify(token, process.env.ADMIN_JWT_SECRET);
-    console.log("Decoded Token:", decoded); // ✅ Log decoded payload
+    
 
     if (decoded.role !== "admin") {
       return res.status(403).json({ message: "Forbidden: Not an admin" });

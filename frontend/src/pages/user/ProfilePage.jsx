@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import profile from "../../assets/images/other/profile.avif";
+import { useUser } from "../../context/UserContext";
+import { useEffect } from "react";
 
 const ProfilePage = () => {
+  const { userInfo, loadingUser } = useUser();
+
   const [profileImage, setProfileImage] = useState(null);
   const [formData, setFormData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@example.com",
-    location: "New Delhi",
-    phone: "+91 9876543210",
+    firstName: "",
+    lastName: "",
+    email: "",
+    location: "",
+    phone: "",
   });
 
   const [editableFields, setEditableFields] = useState({
@@ -20,6 +24,27 @@ const ProfilePage = () => {
     location: false,
     phone: false,
   });
+
+  useEffect(() => {
+    if (userInfo) {
+      setFormData({
+        firstName: userInfo.firstName || "",
+        lastName: userInfo.lastName || "",
+        email: userInfo.email || "",
+        phone: userInfo.phone || "",
+        location:
+          userInfo.location?.state ||
+          userInfo.location?.district ||
+          userInfo.location?.pin
+            ? `${userInfo.location?.district || ""}, ${userInfo.location?.state || ""} - ${userInfo.location?.pin || ""}`
+            : "",
+      });
+
+      if (userInfo.profilePic) {
+        setProfileImage(userInfo.profilePic);
+      }
+    }
+  }, [userInfo]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -41,6 +66,8 @@ const ProfilePage = () => {
       [field]: !prev[field],
     }));
   };
+
+  if (loadingUser) return <div className="text-center py-10">Loading...</div>;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
