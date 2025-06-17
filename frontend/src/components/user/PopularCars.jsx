@@ -39,7 +39,8 @@ const PopularCars = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {displayedCars.map((car) => (
           <Link
-            to={`/car/${encodeURIComponent(car.company)}/${encodeURIComponent(car.model)}`}
+            // to={`/car/${encodeURIComponent(car.company)}/${encodeURIComponent(car.model)}`}
+             to={`/car/${car._id}`}
             key={car._id}
             className="bg-white rounded-xl shadow hover:shadow-md transition duration-300 overflow-hidden"
           >

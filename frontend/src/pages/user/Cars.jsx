@@ -71,9 +71,7 @@ const Cars = () => {
         {filteredCars.map((car, index) => (
           <Link
             key={index}
-            to={`/car/${encodeURIComponent(car.company)}/${encodeURIComponent(
-              car.model
-            )}`}
+            to={`/car/${car._id}`}
           >
             <div className="bg-white p-4 rounded shadow hover:shadow-lg transition cursor-pointer">
               <img

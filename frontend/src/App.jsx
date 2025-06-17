@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 import Auth from "./pages/user/Auth";
 import Home from "./pages/user/Home";
@@ -18,9 +18,13 @@ import ListCars from "./pages/admin/ListCars";
 import MainLayout from "./layouts/MainLayout";
 import PlainLayout from "./layouts/PlainLayout";
 
-import AdminProtectedRoute from "./layouts/AdminProtectedRoute"; 
+import AdminProtectedRoute from "./layouts/AdminProtectedRoute";
 import EditCars from "./pages/admin/EditCars";
 import ViewCar from "./pages/admin/ViewCar";
+import BookTestdrive from "./pages/user/BookTestdrive";
+import ProtectedRoute from "./layouts/ProtectedRoute";
+import TestDrives from "./pages/user/TestDrives";
+import ManageTestDrives from "./pages/admin/ManageTestDrives";
 
 const App = () => {
   return (
@@ -32,9 +36,15 @@ const App = () => {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/brands/:brand" element={<Cars />} />
-          <Route path="/car/:brand/:model" element={<CarDetails />} />
+          <Route path="/car/:id" element={<CarDetails />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
+
+          {/* ✅ Protected User Route: Test Drive Booking */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/book-testdrive/:carId" element={<BookTestdrive />} />
+            <Route path="/test-drives" element={<TestDrives />} />
+          </Route>
         </Route>
 
         {/* User Auth Route (no Navbar/Footer) */}
@@ -60,7 +70,7 @@ const App = () => {
             element={
               <AdminProtectedRoute>
                 {/* <AddCars /> */}
-                <AddCars/>
+                <AddCars />
               </AdminProtectedRoute>
             }
           />
@@ -72,7 +82,7 @@ const App = () => {
               </AdminProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="/admin/edit-car/:id"
             element={
               <AdminProtectedRoute>
@@ -80,12 +90,23 @@ const App = () => {
               </AdminProtectedRoute>
             }
           />
-          <Route path="/admin/view-car/:id" element={
-            <AdminProtectedRoute>
+          <Route
+            path="/admin/view-car/:id"
+            element={
+              <AdminProtectedRoute>
                 <ViewCar />
               </AdminProtectedRoute>
-          } />
+            }
+          />
         </Route>
+        <Route
+          path="/admin/test-drives"
+          element={
+            <AdminProtectedRoute>
+              <ManageTestDrives />
+            </AdminProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

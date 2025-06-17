@@ -68,7 +68,6 @@ export const UserProvider = ({ children }) => {
         },
       }
     );
-    console.log(res.data);
     setUserInfo(res.data);
   } catch (err) {
     console.error("Failed to fetch user info", err);
@@ -78,8 +77,12 @@ export const UserProvider = ({ children }) => {
 };
 
   useEffect(() => {
+  if (user?.token) {
     fetchUserInfo();
-  }, []);
+  } else {
+    setLoadingUser(false); // stop loading state if no user
+  }
+}, [user]);
 
   const updateUserProfile = async (formDataObj) => {
   try {
@@ -122,6 +125,36 @@ export const UserProvider = ({ children }) => {
   }
 };
 
+const bookTestDrive = async (carId, formData) => {
+  try {
+    const token = user?.token;
+    if (!token) throw new Error("User not authenticated");
+
+
+    const res = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/book/testdrive`,
+      {
+        car: carId,
+        ...formData,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { success: true, message: res.data?.message || "Booking successful!" };
+  } catch (err) {
+    console.error("Test drive booking failed", err);
+    return {
+      success: false,
+      message: err.response?.data?.message || "Booking failed",
+    };
+  }
+};
+
+
   return (
     <UserContext.Provider
       value={{
@@ -136,6 +169,7 @@ export const UserProvider = ({ children }) => {
         loadingUser,
         fetchUserInfo,
         updateUserProfile,
+        bookTestDrive,
       }}
     >
       {children}

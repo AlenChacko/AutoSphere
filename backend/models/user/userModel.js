@@ -46,6 +46,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    testDrives: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TestDriveBooking",
+      },
+    ],
   },
   {
     timestamps: true,

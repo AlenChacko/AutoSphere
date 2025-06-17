@@ -1,29 +1,25 @@
-// pages/user/CarDetails.jsx
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import { toast } from "react-toastify";
 
 const CarDetails = () => {
-  const { brand, model } = useParams();
-  const { cars, loadingCars } = useUser();
+  const { id } = useParams(); // ✅ get id from URL
+  const { cars, loadingCars, userInfo } = useUser();
+  const navigate = useNavigate();
 
   const [selectedCar, setSelectedCar] = useState(null);
   const [mainImage, setMainImage] = useState(null);
 
   useEffect(() => {
     if (cars && cars.length > 0) {
-      const match = cars.find(
-        (car) =>
-          car.company.toLowerCase() ===
-            decodeURIComponent(brand).toLowerCase() &&
-          car.model.toLowerCase() === decodeURIComponent(model).toLowerCase()
-      );
+      const match = cars.find((car) => car._id === id); // ✅ match by ID
       setSelectedCar(match);
       if (match?.images?.[0]?.url) {
         setMainImage(match.images[0].url);
       }
     }
-  }, [brand, model, cars]);
+  }, [id, cars]);
 
   if (loadingCars) {
     return <div className="text-center mt-10 text-gray-500">Loading...</div>;
@@ -32,6 +28,15 @@ const CarDetails = () => {
   if (!selectedCar) {
     return <div className="text-center mt-10 text-red-600">Car not found.</div>;
   }
+
+  const handleTestDrive = () => {
+    if (!userInfo) {
+      toast.info("Please login to book a test drive");
+      navigate("/auth");
+    } else {
+      navigate(`/book-testdrive/${selectedCar._id}`);
+    }
+  };
 
   return (
     <div className="px-6 py-10 max-w-6xl mx-auto">
@@ -129,7 +134,10 @@ const CarDetails = () => {
           ))}
       </div>
 
-      <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+      <button
+        onClick={handleTestDrive}
+        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+      >
         Book a Test Drive
       </button>
     </div>

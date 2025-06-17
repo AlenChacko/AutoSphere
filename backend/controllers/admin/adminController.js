@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import handler from "express-async-handler";
 import Car from "../../models/admin/carModel.js";
+import TestDriveBooking from "../../models/user/testdriveModel.js";
 
 export const addCars = handler(async (req, res) => {
   const {
@@ -247,4 +248,12 @@ export const updateCar = handler(async (req, res) => {
 
   await car.save();
   res.status(200).json({ message: "Car updated successfully", car });
+});
+
+export const getAllTestDrives = handler(async (req, res) => {
+  const testDrives = await TestDriveBooking.find()
+    .populate("user", "firstName lastName email")
+    .populate("car", "company model");
+
+  res.status(200).json(testDrives);
 });

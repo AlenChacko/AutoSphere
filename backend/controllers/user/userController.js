@@ -1,6 +1,7 @@
 import handler from "express-async-handler";
 import Car from "../../models/admin/carModel.js";
 import User from "../../models/user/userModel.js";
+import TestDriveBooking from "../../models/user/testdriveModel.js";
 
 export const getAllCars = handler(async (req, res) => {
   const cars = await Car.find();
@@ -63,3 +64,56 @@ export const updateProfile = handler(async (req, res) => {
     profilePic: updatedUser.profilePic,
   });
 });
+
+export const bookTestDrive = handler(async (req, res) => {
+  const userId = req.user._id;
+  const {
+    car,
+    firstName,
+    lastName,
+    email,
+    phone,
+    location,
+    preferredDate, // ✅ use preferredDate instead of date
+  } = req.body;
+
+  // Validation
+  if (
+    !car ||
+    !firstName ||
+    !lastName ||
+    !email ||
+    !phone ||
+    !location?.state ||
+    !location?.district ||
+    !location?.pin ||
+    !preferredDate
+  ) {
+    res.status(400);
+    throw new Error("All fields are required");
+  }
+
+  // Check if car exists
+  const carExists = await Car.findById(car);
+  if (!carExists) {
+    res.status(404);
+    throw new Error("Car not found");
+  }
+
+  // Create booking
+  const booking = await TestDriveBooking.create({
+    user: userId,
+    car,
+    firstName,
+    lastName,
+    email,
+    phone,
+    location,
+    preferredDate, // ✅ assign correctly to schema field
+  });
+
+  res.status(201).json({
+    message: "Test drive booked successfully",
+    booking,
+  });
+})

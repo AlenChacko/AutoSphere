@@ -8,6 +8,7 @@ export const AdminProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [cars, setCars] = useState([]);
   const [selectedCar, setSelectedCar] = useState(null);
+  const [testDrives, setTestDrives] = useState([]);
   const [admin, setAdmin] = useState(
     () => JSON.parse(localStorage.getItem("admin")) || null
   );
@@ -199,6 +200,31 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const fetchTestDrives = async () => {
+  try {
+    setLoading(true);
+    const storedAdmin = JSON.parse(localStorage.getItem("admin"));
+    const token = storedAdmin?.token;
+    if (!token) throw new Error("Admin is not authenticated");
+
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/admin/test-drives`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setTestDrives(data);
+  } catch (err) {
+    console.error("Fetch test drives error:", err);
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <AdminContext.Provider
       value={{
@@ -213,6 +239,8 @@ export const AdminProvider = ({ children }) => {
         selectedCar,
         loading,
         cars,
+        testDrives,
+        fetchTestDrives
       }}
     >
       {children}
