@@ -3,7 +3,7 @@ import {
   registerUser,
   loginUser,
 } from "../../controllers/user/authController.js";
-import { bookTestDrive, getAllCars, getUserInfo, updateProfile } from "../../controllers/user/userController.js";
+import { bookTestDrive, getAllCars, getUserInfo, getUserTestDrives, updateProfile } from "../../controllers/user/userController.js";
 import {userAuth} from '../../middlewares/userAuth.js'
 import { uploadProfile } from "../../middlewares/multer.js";
 
@@ -21,3 +21,5 @@ userRouter.patch(
 );
 
 userRouter.post("/book/testdrive", userAuth, bookTestDrive);
+
+userRouter.get("/test-drives", userAuth, getUserTestDrives);

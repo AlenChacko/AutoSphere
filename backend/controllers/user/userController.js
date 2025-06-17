@@ -116,4 +116,16 @@ export const bookTestDrive = handler(async (req, res) => {
     message: "Test drive booked successfully",
     booking,
   });
-})
+});
+
+export const getUserTestDrives = handler(async (req, res) => {
+  console.log("Authenticated user:", req.user); // ✅ Add this line
+
+  const userId = req.user._id;
+
+  const testDrives = await TestDriveBooking.find({ user: userId }).sort({
+    createdAt: -1,
+  });
+
+  res.status(200).json(testDrives);
+});

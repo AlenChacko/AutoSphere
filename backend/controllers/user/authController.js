@@ -30,16 +30,19 @@ export const registerUser = handler(async (req, res) => {
 
   if (user) {
     res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      user: {
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        token: generateToken(user._id),
-      },
-    });
+  success: true,
+  message: "User registered successfully",
+  user: {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    phone: "",
+    location: { state: "", district: "", pin: "" },
+    profilePic: "",
+    token: generateToken(user._id),
+  },
+});
   } else {
     res.status(500);
     throw new Error("User registration failed");
@@ -70,14 +73,18 @@ export const loginUser = handler(async (req, res) => {
   delete userObj.password;
 
   res.status(200).json({
-    success: true,
-    message: "Login successful",
-    user: {
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      token: generateToken(user._id),
-    },
-  });
+  success: true,
+  message: "Login successful",
+  user: {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    phone: user.phone || "",
+    location: user.location || { state: "", district: "", pin: "" },
+    profilePic: user.profilePic || "", 
+    token: generateToken(user._id),
+  },
+});
+
 });

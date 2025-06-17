@@ -4,13 +4,14 @@ import { Link } from "react-router-dom";
 import profile from "../../assets/images/other/profile.avif";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const { userInfo, loadingUser, updateUserProfile } = useUser();
 
-  useEffect(()=>{
-    console.log('userinfi',userInfo)
-  })
+  useEffect(() => {
+    console.log("userinfi", userInfo);
+  });
 
   const [profileImage, setProfileImage] = useState(null);
   const [profileFile, setProfileFile] = useState(null); // To store actual file for upload
@@ -167,6 +168,12 @@ const ProfilePage = () => {
             >
               Sell Your Car
             </Link>
+            <Link
+              to="/test-drives"
+              className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-blue-700 text-sm font-medium"
+            >
+              Your Bookings
+            </Link>
           </div>
         </div>
       </div>
@@ -211,7 +218,6 @@ const ProfilePage = () => {
               {field}
             </label>
             <input
-
               type={field === "email" ? "email" : "number"}
               name={field}
               value={formData[field]}

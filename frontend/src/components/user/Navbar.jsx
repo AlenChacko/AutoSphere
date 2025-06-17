@@ -8,6 +8,8 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { user, logoutUser } = useUser();
+console.log("User from context:", user);
+
   const navigate = useNavigate();
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
@@ -85,7 +87,15 @@ const Navbar = () => {
                 onClick={toggleDropdown}
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
               >
-                <FaUserCircle size={28} />
+                {user?.profilePic ? (
+                  <img
+                    src={user.profilePic}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUserCircle size={28} />
+                )}
                 <span className="font-medium">
                   {user.firstName} {user.lastName}
                 </span>
@@ -155,7 +165,15 @@ const Navbar = () => {
                   onClick={toggleDropdown}
                   className="flex items-center gap-2 px-2 py-1 text-sm text-gray-700 hover:text-blue-600 w-full"
                 >
-                  <FaUserCircle size={20} />
+                  {user?.profilePic ? (
+                    <img
+                      src={user.profilePic}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <FaUserCircle size={28} />
+                  )}
                   <span>
                     {user.firstName} {user.lastName}
                   </span>
