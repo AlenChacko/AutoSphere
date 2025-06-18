@@ -2,6 +2,7 @@ import handler from "express-async-handler";
 import Car from "../../models/admin/carModel.js";
 import User from "../../models/user/userModel.js";
 import TestDriveBooking from "../../models/user/testdriveModel.js";
+import cloudinary from '../../utils/cloudinary.js'
 
 export const getAllCars = handler(async (req, res) => {
   const cars = await Car.find();
@@ -40,16 +41,30 @@ export const updateProfile = handler(async (req, res) => {
   if (email) user.email = email;
   if (phone) user.phone = phone;
 
-  // Update location if provided
+  // Update location
   user.location = {
     state: state || user.location?.state || "",
     district: district || user.location?.district || "",
     pin: pin || user.location?.pin || "",
   };
 
-  // Update profile image if uploaded
+  // If a new profile image is uploaded
   if (req.file && req.file.path) {
-    user.profilePic = req.file.path; // multer-storage-cloudinary attaches `path`
+    // 🔥 Delete old image from Cloudinary if it exists
+    if (user.profilePic?.public_id) {
+      await cloudinary.uploader.destroy(user.profilePic.public_id);
+    }
+
+    // Upload new image to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "autosphere/profiles",
+    });
+
+    // Set new profile image (as an object)
+    user.profilePic = {
+      public_id: result.public_id,
+      url: result.secure_url,
+    };
   }
 
   const updatedUser = await user.save();
@@ -140,4 +155,66 @@ export const getUserTestDrives = handler(async (req, res) => {
   }
 
   res.status(200).json(user.testDrives); // send populated test drives
+});
+
+export const addUsedCar = handler(async (req, res) => {
+  const {
+    company,
+    model,
+    year,
+    kilometersDriven,
+    accidentHistory,
+    transmission,
+    fuelType,
+    insuranceAvailable,
+  } = req.body;
+
+  // Validate required fields
+  if (
+    !company ||
+    !model ||
+    !year ||
+    !kilometersDriven ||
+    !accidentHistory ||
+    !transmission ||
+    !fuelType ||
+    !insuranceAvailable
+  ) {
+    res.status(400);
+    throw new Error("Please fill in all required fields");
+  }
+
+  // Ensure images are uploaded
+  if (!req.files || req.files.length === 0) {
+    res.status(400);
+    throw new Error("Please upload at least one image");
+  }
+
+  // Upload images to Cloudinary
+  const uploadedImages = [];
+  for (let file of req.files) {
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: "autosphere/used-cars",
+    });
+
+    uploadedImages.push({
+      url: result.secure_url,
+      public_id: result.public_id,
+    });
+  }
+
+  const usedCar = await UsedCar.create({
+    company,
+    model,
+    year,
+    kilometersDriven,
+    accidentHistory,
+    transmission,
+    fuelType,
+    insuranceAvailable,
+    images: uploadedImages,
+    postedBy: req.user._id,
+  });
+
+  res.status(201).json({ message: "Used car listed successfully", usedCar });
 });

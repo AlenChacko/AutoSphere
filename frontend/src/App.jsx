@@ -26,6 +26,7 @@ import ProtectedRoute from "./layouts/ProtectedRoute";
 import TestDrives from "./pages/user/TestDrives";
 import ManageTestDrives from "./pages/admin/ManageTestDrives";
 import SearchResults from "./components/user/SearchResults";
+import SellCar from "./pages/user/SellCar";
 
 const App = () => {
   return (
@@ -38,8 +39,8 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/brands/:brand" element={<Cars />} />
           <Route path="/car/:id" element={<CarDetails />} />
-          
-<Route path="/search" element={<SearchResults />} />
+
+          <Route path="/search" element={<SearchResults />} />
 
           {/* ✅ Protected User Route: Test Drive Booking */}
           <Route element={<ProtectedRoute />}>
@@ -47,6 +48,7 @@ const App = () => {
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/book-testdrive/:carId" element={<BookTestdrive />} />
             <Route path="/test-drives" element={<TestDrives />} />
+            <Route path="/sell-car" element={<SellCar />} />
           </Route>
         </Route>
 

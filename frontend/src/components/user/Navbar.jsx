@@ -8,7 +8,6 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { user, logoutUser } = useUser();
-
   const navigate = useNavigate();
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
@@ -42,12 +41,21 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 text-lg">
-          
+          {/* Show "Sell Old Car" only if user is logged in */}
+          {user && (
+            <Link
+              to="/sell-car"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              SELL CARS
+            </Link>
+          )}
+
           <Link
             to="/used-cars"
             className="text-gray-700 hover:text-blue-600 font-medium"
           >
-            Find Used Cars
+            USED CARS
           </Link>
 
           <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
@@ -109,12 +117,6 @@ const Navbar = () => {
                   >
                     Wishlist
                   </Link>
-                  <Link
-                    to="/sell"
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Sell Your Car
-                  </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-700"
@@ -139,12 +141,21 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden mt-4 space-y-4">
           <div className="space-y-1">
-            
+            {/* Show "Sell Old Car" only if user is logged in */}
+            {user && (
+              <Link
+                to="/sell-car"
+                className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
+              >
+                SELL CARS
+              </Link>
+            )}
+
             <Link
               to="/used-cars"
               className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
             >
-              Find Used Cars
+              USED CARS
             </Link>
 
             {user ? (
@@ -182,12 +193,6 @@ const Navbar = () => {
                       className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
                     >
                       Wishlist
-                    </Link>
-                    <Link
-                      to="/sell"
-                      className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
-                    >
-                      Sell Your Car
                     </Link>
                     <button
                       onClick={handleLogout}

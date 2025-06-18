@@ -51,9 +51,9 @@ const ProfilePage = () => {
         },
       });
 
-      if (userInfo.profilePic) {
-        setProfileImage(userInfo.profilePic);
-      }
+      if (userInfo.profilePic?.url) {
+  setProfileImage(userInfo.profilePic.url); // ✅ Correct
+}
     }
   }, [userInfo]);
 

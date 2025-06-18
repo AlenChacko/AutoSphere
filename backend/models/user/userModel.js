@@ -43,8 +43,8 @@ const userSchema = new mongoose.Schema(
       },
     },
     profilePic: {
-      type: String,
-      default: "",
+      public_id: { type: String, default: "" },
+      url: { type: String, default: "" },
     },
 
     testDrives: [

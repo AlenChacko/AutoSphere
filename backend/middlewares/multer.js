@@ -16,7 +16,6 @@ const carStorage = new CloudinaryStorage({
 
 const uploadCar = multer({ storage: carStorage });
 
-
 // 👤 Storage for profile pictures
 const profileStorage = new CloudinaryStorage({
   cloudinary,
@@ -31,6 +30,16 @@ const profileStorage = new CloudinaryStorage({
 
 const uploadProfile = multer({ storage: profileStorage });
 
+// 🚙 Used Cars Storage (new)
+const usedCarStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => ({
+    folder: "autosphere/used-cars",
+    allowed_formats: ["jpg", "png", "jpeg", "webp", "avif"],
+    public_id: `${Date.now()}-${file.originalname}`,
+  }),
+});
+const uploadUsedCar = multer({ storage: usedCarStorage });
 
 // ✅ Export both uploaders
-export { uploadCar, uploadProfile };
+export { uploadCar, uploadProfile, uploadUsedCar };
