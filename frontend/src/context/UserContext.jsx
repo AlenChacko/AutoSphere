@@ -12,6 +12,7 @@ export const UserProvider = ({ children }) => {
   const [errorCars, setErrorCars] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [filteredCars, setFilteredCars] = useState([]);
 
   const loginUser = (userData) => {
     setUser(userData);
@@ -45,142 +46,169 @@ export const UserProvider = ({ children }) => {
     fetchCars();
   }, []);
 
+  useEffect(() => {
+    if (cars.length > 0) {
+      setFilteredCars(cars);
+    }
+  }, [cars]);
+
+  const searchCars = (searchTerm) => {
+    if (!searchTerm || searchTerm.trim() === "") {
+      setFilteredCars(cars); // reset to all cars
+      return;
+    }
+
+    const term = searchTerm.toLowerCase();
+    const result = cars.filter(
+      (car) =>
+        car.model.toLowerCase().includes(term) ||
+        car.company.toLowerCase().includes(term) ||
+        (car?.title && car.title.toLowerCase().includes(term))
+    );
+    setFilteredCars(result);
+  };
+
   // Safely filter popular cars
   const popularCars = cars.filter(
     (car) => car?.price?.start >= 5 && car?.price?.start <= 15
   );
 
   const fetchUserInfo = async () => {
-  try {
-    setLoadingUser(true);
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const token = storedUser?.token;
+    try {
+      setLoadingUser(true);
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const token = storedUser?.token;
 
-    if (!token) {
-      throw new Error("No token found");
-    }
-
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/profile`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      if (!token) {
+        throw new Error("No token found");
       }
-    );
-    setUserInfo(res.data);
-  } catch (err) {
-    console.error("Failed to fetch user info", err);
-  } finally {
-    setLoadingUser(false);
-  }
-};
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUserInfo(res.data);
+    } catch (err) {
+      console.error("Failed to fetch user info", err);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
 
   useEffect(() => {
-  if (user?.token) {
-    fetchUserInfo();
-  } else {
-    setLoadingUser(false); // stop loading state if no user
-  }
-}, [user]);
+    if (user?.token) {
+      fetchUserInfo();
+    } else {
+      setLoadingUser(false); // stop loading state if no user
+    }
+  }, [user]);
 
   const updateUserProfile = async (formDataObj) => {
-  try {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const token = storedUser?.token;
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const token = storedUser?.token;
 
-    if (!token) throw new Error("No token");
+      if (!token) throw new Error("No token");
 
-    const formData = new FormData();
+      const formData = new FormData();
 
-    // Append fields
-    for (const key in formDataObj) {
-      if (key === "location") {
-        for (const locKey in formDataObj.location) {
-          formData.append(locKey, formDataObj.location[locKey]);
+      // Append fields
+      for (const key in formDataObj) {
+        if (key === "location") {
+          for (const locKey in formDataObj.location) {
+            formData.append(locKey, formDataObj.location[locKey]);
+          }
+        } else if (
+          key === "profilePic" &&
+          formDataObj.profilePic instanceof File
+        ) {
+          formData.append("profilePic", formDataObj.profilePic);
+        } else {
+          formData.append(key, formDataObj[key]);
         }
-      } else if (key === "profilePic" && formDataObj.profilePic instanceof File) {
-        formData.append("profilePic", formDataObj.profilePic);
-      } else {
-        formData.append(key, formDataObj[key]);
       }
+
+      await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/update`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      await fetchUserInfo(); // Refresh updated data
+      return { success: true };
+    } catch (err) {
+      console.error("Profile update failed", err);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Update failed",
+      };
     }
+  };
 
-    await axios.patch(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/update`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+  const bookTestDrive = async (carId, formData) => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/book/testdrive`,
+        {
+          car: carId,
+          ...formData,
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    await fetchUserInfo(); // Refresh updated data
-    return { success: true };
-  } catch (err) {
-    console.error("Profile update failed", err);
-    return { success: false, message: err.response?.data?.message || "Update failed" };
-  }
-};
+      return {
+        success: true,
+        message: res.data?.message || "Booking successful!",
+      };
+    } catch (err) {
+      console.error("Test drive booking failed", err);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Booking failed",
+      };
+    }
+  };
 
-const bookTestDrive = async (carId, formData) => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
+  const getUserTestDrives = async () => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
 
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/testdrives`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    const res = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/book/testdrive`,
-      {
-        car: carId,
-        ...formData,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return { success: true, message: res.data?.message || "Booking successful!" };
-  } catch (err) {
-    console.error("Test drive booking failed", err);
-    return {
-      success: false,
-      message: err.response?.data?.message || "Booking failed",
-    };
-  }
-};
-
-const getUserTestDrives = async () => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/testdrives`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    console.log("📦 Test Drives:", res.data);
-    return { success: true, data: res.data };
-  } catch (err) {
-    console.error("❌ Failed to fetch test drives:", err);
-    return {
-      success: false,
-      message: err.response?.data?.message || "Failed to fetch test drives",
-    };
-  }
-};
-
-
-
+      console.log("📦 Test Drives:", res.data);
+      return { success: true, data: res.data };
+    } catch (err) {
+      console.error("❌ Failed to fetch test drives:", err);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Failed to fetch test drives",
+      };
+    }
+  };
 
   return (
     <UserContext.Provider
@@ -189,6 +217,7 @@ const getUserTestDrives = async () => {
         loginUser,
         logoutUser,
         cars,
+        filteredCars,
         popularCars,
         loadingCars,
         errorCars,
@@ -198,6 +227,7 @@ const getUserTestDrives = async () => {
         updateUserProfile,
         bookTestDrive,
         getUserTestDrives,
+        searchCars,
       }}
     >
       {children}

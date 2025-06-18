@@ -42,17 +42,12 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 text-lg">
-          <Link
-            to="/new-cars"
-            className="text-gray-700 hover:text-blue-600 font-medium"
-          >
-            New Cars
-          </Link>
+          
           <Link
             to="/used-cars"
             className="text-gray-700 hover:text-blue-600 font-medium"
           >
-            Used Cars
+            Find Used Cars
           </Link>
 
           <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
@@ -144,17 +139,12 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden mt-4 space-y-4">
           <div className="space-y-1">
-            <Link
-              to="/new-cars"
-              className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
-            >
-              New Cars
-            </Link>
+            
             <Link
               to="/used-cars"
               className="block px-2 py-1 hover:bg-gray-100 text-sm text-gray-700"
             >
-              Used Cars
+              Find Used Cars
             </Link>
 
             {user ? (
