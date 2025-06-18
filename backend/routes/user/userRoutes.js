@@ -22,4 +22,5 @@ userRouter.patch(
 
 userRouter.post("/book/testdrive", userAuth, bookTestDrive);
 
-userRouter.get("/test-drives", userAuth, getUserTestDrives);
+
+userRouter.get("/testdrives", userAuth, getUserTestDrives);

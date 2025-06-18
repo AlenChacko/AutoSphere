@@ -124,13 +124,20 @@ export const bookTestDrive = handler(async (req, res) => {
 });
 
 export const getUserTestDrives = handler(async (req, res) => {
-  console.log("Authenticated user:", req.user); // ✅ Add this line
-
   const userId = req.user._id;
 
-  const testDrives = await TestDriveBooking.find({ user: userId }).sort({
-    createdAt: -1,
-  });
+  const user = await User.findById(userId)
+    .populate({
+      path: "testDrives",
+      populate: {
+        path: "car", 
+      },
+    });
 
-  res.status(200).json(testDrives);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user.testDrives); // send populated test drives
 });

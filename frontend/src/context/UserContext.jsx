@@ -154,6 +154,31 @@ const bookTestDrive = async (carId, formData) => {
   }
 };
 
+const getUserTestDrives = async () => {
+  try {
+    const token = user?.token;
+    if (!token) throw new Error("User not authenticated");
+
+    const res = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/testdrives`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("📦 Test Drives:", res.data);
+    return { success: true, data: res.data };
+  } catch (err) {
+    console.error("❌ Failed to fetch test drives:", err);
+    return {
+      success: false,
+      message: err.response?.data?.message || "Failed to fetch test drives",
+    };
+  }
+};
+
 
 
 
@@ -172,6 +197,7 @@ const bookTestDrive = async (carId, formData) => {
         fetchUserInfo,
         updateUserProfile,
         bookTestDrive,
+        getUserTestDrives,
       }}
     >
       {children}
