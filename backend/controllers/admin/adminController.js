@@ -257,3 +257,25 @@ export const getAllTestDrives = handler(async (req, res) => {
 
   res.status(200).json(testDrives);
 });
+
+export const updateTestDriveStatus = handler(async (req, res) => {
+  const { status, assignedDate } = req.body;
+  const { id } = req.params;
+
+  const booking = await TestDriveBooking.findById(id);
+  if (!booking) {
+    res.status(404);
+    throw new Error("Test drive booking not found");
+  }
+
+  // Update only if values provided
+  if (status) booking.status = status;
+  if (assignedDate) booking.assignedDate = assignedDate;
+
+  const updated = await booking.save();
+  res.status(200).json({
+    success: true,
+    message: "Booking updated successfully",
+    data: updated,
+  });
+});

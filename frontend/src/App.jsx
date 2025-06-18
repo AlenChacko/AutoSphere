@@ -37,11 +37,11 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/brands/:brand" element={<Cars />} />
           <Route path="/car/:id" element={<CarDetails />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
 
           {/* ✅ Protected User Route: Test Drive Booking */}
           <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/book-testdrive/:carId" element={<BookTestdrive />} />
             <Route path="/test-drives" element={<TestDrives />} />
           </Route>

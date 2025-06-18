@@ -5,6 +5,7 @@ const ManageTestDrives = () => {
   const { fetchTestDrives, testDrives, updateTestDriveStatus } = useAdmin();
   const [loading, setLoading] = useState(true);
   const [updates, setUpdates] = useState({});
+  const [submitting, setSubmitting] = useState({});
 
   useEffect(() => {
     const loadTestDrives = async () => {
@@ -28,8 +29,16 @@ const ManageTestDrives = () => {
     const update = updates[id];
     if (!update) return;
 
-    await updateTestDriveStatus(id, update);
-    await fetchTestDrives();
+    setSubmitting((prev) => ({ ...prev, [id]: true }));
+
+    const res = await updateTestDriveStatus(id, update);
+
+    if (res.success) {
+      await fetchTestDrives();
+      setUpdates((prev) => ({ ...prev, [id]: {} }));
+    }
+
+    setSubmitting((prev) => ({ ...prev, [id]: false }));
   };
 
   return (
@@ -61,7 +70,9 @@ const ManageTestDrives = () => {
             <tbody>
               {testDrives.map((booking) => (
                 <tr key={booking._id} className="border-t hover:bg-gray-50">
-                  <td className="py-3 px-4 text-sm text-gray-700">{booking._id}</td>
+                  <td className="py-3 px-4 text-sm text-gray-700">
+                    {booking._id}
+                  </td>
                   <td className="py-3 px-4">
                     {booking.firstName} {booking.lastName}
                   </td>
@@ -82,7 +93,11 @@ const ManageTestDrives = () => {
                     <select
                       value={updates[booking._id]?.status || booking.status}
                       onChange={(e) =>
-                        handleUpdateChange(booking._id, "status", e.target.value)
+                        handleUpdateChange(
+                          booking._id,
+                          "status",
+                          e.target.value
+                        )
                       }
                       className="border px-2 py-1 rounded-md"
                     >
@@ -98,11 +113,17 @@ const ManageTestDrives = () => {
                       value={
                         updates[booking._id]?.assignedDate ||
                         (booking.assignedDate
-                          ? new Date(booking.assignedDate).toISOString().split("T")[0]
+                          ? new Date(booking.assignedDate)
+                              .toISOString()
+                              .split("T")[0]
                           : "")
                       }
                       onChange={(e) =>
-                        handleUpdateChange(booking._id, "assignedDate", e.target.value)
+                        handleUpdateChange(
+                          booking._id,
+                          "assignedDate",
+                          e.target.value
+                        )
                       }
                       className="border px-2 py-1 rounded-md"
                     />
@@ -110,9 +131,10 @@ const ManageTestDrives = () => {
                   <td className="py-3 px-4">
                     <button
                       onClick={() => handleUpdateSubmit(booking._id)}
-                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition disabled:opacity-50"
+                      disabled={submitting[booking._id]}
                     >
-                      Update
+                      {submitting[booking._id] ? "Updating..." : "Update"}
                     </button>
                   </td>
                 </tr>

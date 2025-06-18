@@ -14,11 +14,9 @@ import jwt from "jsonwebtoken";
       }
 
       req.user = decoded; // ✅ Set decoded payload to req.user
-      console.log("🚀 Admin Authenticated:", req.user);
 
       next();
     } catch (error) {
-      console.error("JWT verification failed:", error);
       res.status(401).json({ message: "Invalid token" });
     }
   } else {

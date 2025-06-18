@@ -225,6 +225,35 @@ export const AdminProvider = ({ children }) => {
   }
 };
 
+const updateTestDriveStatus = async (id, updateData) => {
+  try {
+    setLoading(true);
+    const storedAdmin = JSON.parse(localStorage.getItem("admin"));
+    const token = storedAdmin?.token;
+    if (!token) throw new Error("Admin is not authenticated");
+
+    const { data } = await axios.put(
+      `${import.meta.env.VITE_BACKEND_URL}/api/admin/testdrives/${id}`,
+      updateData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Update test drive error:", err);
+    return {
+      success: false,
+      message: err?.response?.data?.message || "Update failed",
+    };
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <AdminContext.Provider
       value={{
@@ -240,7 +269,8 @@ export const AdminProvider = ({ children }) => {
         loading,
         cars,
         testDrives,
-        fetchTestDrives
+        fetchTestDrives,
+        updateTestDriveStatus,
       }}
     >
       {children}

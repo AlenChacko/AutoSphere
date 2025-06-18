@@ -7,6 +7,7 @@ import {
   getCarById,
   getCars,
   updateCar,
+  updateTestDriveStatus,
 } from "../../controllers/admin/adminController.js";
 import { uploadCar } from "../../middlewares/multer.js";
 import adminAuth from "../../middlewares/adminAuth.js";
@@ -42,3 +43,5 @@ adminRouter.put(
 );
 
 adminRouter.get("/test-drives", adminAuth, getAllTestDrives);
+
+adminRouter.put("/testdrives/:id", adminAuth, updateTestDriveStatus);
