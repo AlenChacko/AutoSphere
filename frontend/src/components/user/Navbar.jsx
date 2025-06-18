@@ -89,9 +89,9 @@ const Navbar = () => {
                 onClick={toggleDropdown}
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
               >
-                {user?.profilePic ? (
+                {user?.profilePic?.url ? (
                   <img
-                    src={user.profilePic}
+                    src={user.profilePic.url}
                     alt="Profile"
                     className="w-8 h-8 rounded-full object-cover"
                   />
@@ -167,7 +167,7 @@ const Navbar = () => {
                 >
                   {user?.profilePic ? (
                     <img
-                      src={user.profilePic}
+                      src={user.profilePic.url}
                       alt="Profile"
                       className="w-8 h-8 rounded-full object-cover"
                     />
