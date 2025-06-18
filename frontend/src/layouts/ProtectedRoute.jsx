@@ -1,17 +1,14 @@
 // layouts/ProtectedRoute.jsx
 import React from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
 const ProtectedRoute = () => {
-  const { userInfo } = useUser();
-  const location = useLocation();
+  const { user, loadingUser } = useUser();
 
-  return userInfo ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/auth" replace state={{ from: location }} />
-  );
+  if (loadingUser) return <p className="p-4">Loading...</p>;
+
+  return user?.token ? <Outlet /> : <Navigate to="/auth" replace />;
 };
 
 export default ProtectedRoute;
