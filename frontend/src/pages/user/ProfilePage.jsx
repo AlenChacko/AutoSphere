@@ -161,7 +161,7 @@ const ProfilePage = () => {
               Your Ads
             </Link>
             <Link
-              to="/sell"
+              to="/sell-car"
               className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 text-sm font-medium"
             >
               Sell Your Car

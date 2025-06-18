@@ -1,6 +1,7 @@
 import handler from "express-async-handler";
 import Car from "../../models/admin/carModel.js";
 import User from "../../models/user/userModel.js";
+import UsedCar from '../../models/user/usedCarModel.js'
 import TestDriveBooking from "../../models/user/testdriveModel.js";
 import cloudinary from '../../utils/cloudinary.js'
 
@@ -167,9 +168,30 @@ export const addUsedCar = handler(async (req, res) => {
     transmission,
     fuelType,
     insuranceAvailable,
+    place,
+    district,
+    state,
+    phone,
+    price,
   } = req.body;
 
-  // Validate required fields
+  const imageFiles = req?.files || [];
+
+  // ✅ Upload each image to Cloudinary
+  const images = await Promise.all(
+    imageFiles.map(async (file) => {
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: "autosphere/used-cars",
+      });
+
+      return {
+        public_id: result.public_id,
+        url: result.secure_url,
+      };
+    })
+  );
+
+  // ✅ Validate required fields
   if (
     !company ||
     !model ||
@@ -178,43 +200,52 @@ export const addUsedCar = handler(async (req, res) => {
     !accidentHistory ||
     !transmission ||
     !fuelType ||
-    !insuranceAvailable
+    !insuranceAvailable ||
+    !place ||
+    !district ||
+    !state ||
+    !phone ||
+    !price ||
+    images.length === 0
   ) {
-    res.status(400);
-    throw new Error("Please fill in all required fields");
+    return res
+      .status(400)
+      .json({ message: "Please fill in all required fields." });
   }
 
-  // Ensure images are uploaded
-  if (!req.files || req.files.length === 0) {
-    res.status(400);
-    throw new Error("Please upload at least one image");
-  }
-
-  // Upload images to Cloudinary
-  const uploadedImages = [];
-  for (let file of req.files) {
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder: "autosphere/used-cars",
-    });
-
-    uploadedImages.push({
-      url: result.secure_url,
-      public_id: result.public_id,
-    });
-  }
-
-  const usedCar = await UsedCar.create({
-    company,
-    model,
-    year,
-    kilometersDriven,
+  // ✅ Create and save the used car
+  const usedCar = new UsedCar({
+    company: company.trim(),
+    model: model.trim(),
+    year: Number(year),
+    kilometersDriven: Number(kilometersDriven),
     accidentHistory,
     transmission,
     fuelType,
     insuranceAvailable,
-    images: uploadedImages,
+    place: place.trim(),
+    district: district.trim(),
+    state: state.trim(),
+    phone: phone.trim(),
+    price: Number(price),
+    images,
     postedBy: req.user._id,
   });
 
-  res.status(201).json({ message: "Used car listed successfully", usedCar });
+  await usedCar.save();
+
+  res.status(201).json({
+    message: "Used car added successfully",
+    usedCar,
+  });
+});
+
+export const getMyUsedCars = handler(async (req, res) => {
+  const userId = req.user._id;
+
+  const myAds = await UsedCar.find({ postedBy: userId }).sort({
+    createdAt: -1,
+  });
+
+  res.status(200).json(myAds);
 });

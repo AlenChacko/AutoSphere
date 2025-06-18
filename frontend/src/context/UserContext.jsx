@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const UserContext = createContext();
 
@@ -210,6 +211,61 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+ const addUsedCar = async (formData) => {
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const token = storedUser?.token;
+
+    if (!token) throw new Error("User not authenticated");
+
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/add-used-car`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+    
+    return data;
+  } catch (error) {
+    console.error("❌ Error adding used car:", error.response?.data || error);
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to list your car. Please try again."
+    );
+    throw error;
+  }
+};
+
+const getMyUsedCars = async () => {
+  try {
+    const token = user?.token;
+    if (!token) throw new Error("User not authenticated");
+
+    const res = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/my-used-cars`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(res.data)
+
+    return { success: true, data: res.data };
+  } catch (err) {
+    console.error("Failed to fetch my ads:", err);
+    return {
+      success: false,
+      message: err.response?.data?.message || "Failed to fetch your ads",
+    };
+  }
+};
+
   return (
     <UserContext.Provider
       value={{
@@ -228,6 +284,8 @@ export const UserProvider = ({ children }) => {
         bookTestDrive,
         getUserTestDrives,
         searchCars,
+        addUsedCar,
+        getMyUsedCars,
       }}
     >
       {children}

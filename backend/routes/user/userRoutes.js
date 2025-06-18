@@ -3,9 +3,17 @@ import {
   registerUser,
   loginUser,
 } from "../../controllers/user/authController.js";
-import { bookTestDrive, getAllCars, getUserInfo, getUserTestDrives, updateProfile } from "../../controllers/user/userController.js";
-import {userAuth} from '../../middlewares/userAuth.js'
-import { uploadProfile } from "../../middlewares/multer.js";
+import {
+  addUsedCar,
+  bookTestDrive,
+  getAllCars,
+  getMyUsedCars,
+  getUserInfo,
+  getUserTestDrives,
+  updateProfile,
+} from "../../controllers/user/userController.js";
+import { userAuth } from "../../middlewares/userAuth.js";
+import { uploadProfile, uploadUsedCar } from "../../middlewares/multer.js";
 
 export const userRouter = express.Router();
 
@@ -19,8 +27,12 @@ userRouter.patch(
   uploadProfile.single("profilePic"),
   updateProfile
 );
-
 userRouter.post("/book/testdrive", userAuth, bookTestDrive);
-
-
 userRouter.get("/testdrives", userAuth, getUserTestDrives);
+userRouter.post(
+  "/add-used-car",
+  userAuth,
+  uploadUsedCar.array("images", 5),
+  addUsedCar
+);
+userRouter.get("/my-used-cars", userAuth, getMyUsedCars);

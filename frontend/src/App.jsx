@@ -27,6 +27,7 @@ import TestDrives from "./pages/user/TestDrives";
 import ManageTestDrives from "./pages/admin/ManageTestDrives";
 import SearchResults from "./components/user/SearchResults";
 import SellCar from "./pages/user/SellCar";
+import MyAds from "./pages/user/MyAds";
 
 const App = () => {
   return (
@@ -49,6 +50,7 @@ const App = () => {
             <Route path="/book-testdrive/:carId" element={<BookTestdrive />} />
             <Route path="/test-drives" element={<TestDrives />} />
             <Route path="/sell-car" element={<SellCar />} />
+            <Route path="/your-ads" element={<MyAds />} />
           </Route>
         </Route>
 

@@ -12,6 +12,16 @@ const usedCarSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    place: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     year: {
       type: Number,
       required: true,
@@ -41,6 +51,11 @@ const usedCarSchema = new mongoose.Schema(
       type: String,
       enum: ["Yes", "No"],
       required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 1000, // you can adjust minimum based on your use case
     },
     images: [
       {
