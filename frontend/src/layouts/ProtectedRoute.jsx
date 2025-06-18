@@ -1,17 +1,12 @@
-// layouts/ProtectedRoute.jsx
-import React from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const { userInfo } = useUser();
-  const location = useLocation();
+  const { userInfo, loadingUser } = useUser();
 
-  return userInfo ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/auth" replace state={{ from: location }} />
-  );
+  if (loadingUser) return <div>Loading...</div>;
+
+  return userInfo ? <Outlet /> : <Navigate to="/auth" />;
 };
 
 export default ProtectedRoute;

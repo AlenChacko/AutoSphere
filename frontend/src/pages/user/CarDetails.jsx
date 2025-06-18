@@ -11,6 +11,8 @@ const CarDetails = () => {
   const [selectedCar, setSelectedCar] = useState(null);
   const [mainImage, setMainImage] = useState(null);
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   useEffect(() => {
     if (cars && cars.length > 0) {
       const match = cars.find((car) => car._id === id); // ✅ match by ID
@@ -28,6 +30,21 @@ const CarDetails = () => {
   if (!selectedCar) {
     return <div className="text-center mt-10 text-red-600">Car not found.</div>;
   }
+
+  const nextImage = () => {
+    if (selectedCar.images && selectedCar.images.length > 0) {
+      setCurrentIndex(
+        (prevIndex) => (prevIndex + 1) % selectedCar.images.length
+      );
+    }
+  };
+  const prevImage = () => {
+    if (selectedCar.images && selectedCar.images.length > 0) {
+      setCurrentIndex((prevIndex) =>
+        prevIndex === 0 ? selectedCar.images.length - 1 : prevIndex - 1
+      );
+    }
+  };
 
   const handleTestDrive = () => {
     if (!userInfo) {
@@ -55,24 +72,43 @@ const CarDetails = () => {
 
       <p className="text-gray-600 text-lg mb-6">{selectedCar.descriptions}</p>
 
-      {/* Main Image */}
-      <div className="mb-4">
+      {/* Image Carousel */}
+      {/* Image Carousel */}
+      <div className="relative w-full h-[500px] mb-6 shadow-xl rounded-xl overflow-hidden">
         <img
-          src={mainImage || "/fallback-car.jpg"}
-          alt="main"
-          className="rounded-xl w-full h-[400px] object-contain shadow-lg"
+          src={selectedCar.images?.[currentIndex]?.url || "/fallback-car.jpg"}
+          alt={`car-${currentIndex}`}
+          className="w-full h-full object-contain"
         />
+
+        {/* Left Arrow */}
+        <button
+          onClick={prevImage}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-200"
+        >
+          ◀
+        </button>
+
+        {/* Right Arrow */}
+        <button
+          onClick={nextImage}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-200"
+        >
+          ▶
+        </button>
       </div>
 
       {/* Thumbnails */}
-      <div className="flex gap-4 mb-8">
-        {selectedCar.images?.slice(1).map((img, idx) => (
+      <div className="flex gap-3 justify-center mt-2 mb-8">
+        {selectedCar.images?.map((img, idx) => (
           <img
             key={idx}
             src={img.url}
             alt={`thumb-${idx}`}
-            onClick={() => setMainImage(img.url)}
-            className="w-32 h-20 object-cover rounded-md cursor-pointer border-2 hover:border-blue-500"
+            onClick={() => setCurrentIndex(idx)}
+            className={`w-20 h-14 object-cover rounded-md cursor-pointer border-2 ${
+              currentIndex === idx ? "border-blue-500" : "border-transparent"
+            }`}
           />
         ))}
       </div>

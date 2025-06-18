@@ -9,6 +9,7 @@ const OPTIONS = {
   bodyTypes: [
     "Mini SUV",
     "Compact SUV",
+    "Crossover SUV",
     "Full Size SUV",
     "Coupe SUV",
     "Coupe",
@@ -21,7 +22,7 @@ const OPTIONS = {
   ],
   driveTrains: ["FWD", "RWD", "AWD", "4x4"],
   fuelOptions: ["Petrol", "Diesel", "CNG", "Electric", "Hybrid"],
-  transmission: ["CVT", "DSG", "DCT", "AMT", "MT", "TC","AT"], 
+  transmission: ["CVT", "DSG", "DCT", "AMT", "MT", "TC","AT","E-AUTO"], 
 };
 
 const EditCars = () => {
