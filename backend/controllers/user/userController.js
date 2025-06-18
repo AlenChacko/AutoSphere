@@ -74,7 +74,7 @@ export const bookTestDrive = handler(async (req, res) => {
     email,
     phone,
     location,
-    preferredDate, // ✅ use preferredDate instead of date
+    preferredDate,
   } = req.body;
 
   // Validation
@@ -109,7 +109,12 @@ export const bookTestDrive = handler(async (req, res) => {
     email,
     phone,
     location,
-    preferredDate, // ✅ assign correctly to schema field
+    preferredDate,
+  });
+
+  // ⬇️ NEW: Push booking to user's testDrives array
+  await User.findByIdAndUpdate(userId, {
+    $push: { testDrives: booking._id },
   });
 
   res.status(201).json({

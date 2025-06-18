@@ -9,9 +9,7 @@ import { useNavigate } from "react-router-dom";
 const ProfilePage = () => {
   const { userInfo, loadingUser, updateUserProfile } = useUser();
 
-  useEffect(() => {
-    console.log("userinfi", userInfo);
-  });
+ 
 
   const [profileImage, setProfileImage] = useState(null);
   const [profileFile, setProfileFile] = useState(null); // To store actual file for upload

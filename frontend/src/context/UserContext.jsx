@@ -154,17 +154,7 @@ const bookTestDrive = async (carId, formData) => {
   }
 };
 
-const fetchMyTestDrives = async () => {
-  try {
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/user/test-drives`, {
-      headers: { Authorization: `Bearer ${userInfo?.token}` },
-    });
-    return Array.isArray(res.data) ? res.data : [];
-  } catch (err) {
-    console.error("Error fetching test drives", err);
-    return [];
-  }
-};
+
 
 
   return (
@@ -182,7 +172,6 @@ const fetchMyTestDrives = async () => {
         fetchUserInfo,
         updateUserProfile,
         bookTestDrive,
-        fetchMyTestDrives,
       }}
     >
       {children}

@@ -8,7 +8,6 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { user, logoutUser } = useUser();
-console.log("User from context:", user);
 
   const navigate = useNavigate();
 
