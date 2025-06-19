@@ -13,6 +13,7 @@ const ViewAd = () => {
     saveToWishlist,
     removeFromWishlist,
     isInWishlist,
+    createConversation,
   } = useUser();
 
   const [ad, setAd] = useState(null);
@@ -59,6 +60,21 @@ const ViewAd = () => {
     }
   };
 
+  const startChatWithSeller = async () => {
+    if (!userInfo) {
+      toast.info("Please login to chat with the seller");
+      navigate("/auth");
+      return;
+    }
+
+    const res = await createConversation(ad.postedBy._id, ad._id);
+    if (res.success) {
+      navigate(`/chat/${res.conversation._id}`);
+    } else {
+      toast.error(res.message || "Something went wrong!");
+    }
+  };
+
   const isOwner = userInfo?._id === ad?.postedBy?._id;
 
   if (loading) return <div className="text-center mt-10">Loading ad...</div>;
@@ -91,7 +107,7 @@ const ViewAd = () => {
               ))}
           </div>
 
-          {/* ✅ Save Ad Icon — Only if user is logged in */}
+          {/* Save Ad */}
           {userInfo && !isOwner && (
             <div
               className="mt-4 flex items-center gap-2 cursor-pointer text-indigo-600"
@@ -118,9 +134,7 @@ const ViewAd = () => {
 
           <div className="space-y-2 text-gray-700 text-[15px]">
             <p>
-              <span className="text-gray-600 font-medium">
-                Kilometers Driven:
-              </span>{" "}
+              <span className="text-gray-600 font-medium">Kilometers Driven:</span>{" "}
               <span className="font-semibold">{ad.kilometersDriven} km</span>
             </p>
             <p>
@@ -132,9 +146,7 @@ const ViewAd = () => {
               <span className="font-semibold">{ad.transmission}</span>
             </p>
             <p>
-              <span className="text-gray-600 font-medium">
-                Accident History:
-              </span>{" "}
+              <span className="text-gray-600 font-medium">Accident History:</span>{" "}
               <span className="font-semibold">{ad.accidentHistory}</span>
             </p>
             <p>
@@ -162,7 +174,7 @@ const ViewAd = () => {
             <p>
               Posted by:{" "}
               <span className="font-medium text-gray-700">
-                {ad.postedBy?.firstName} {ad.postedBy?.lastName || ""} 
+                {ad.postedBy?.firstName} {ad.postedBy?.lastName || ""}
               </span>
             </p>
             <p>
@@ -187,14 +199,7 @@ const ViewAd = () => {
           ) : (
             <button
               className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded shadow"
-              onClick={() => {
-                if (!userInfo) {
-                  toast.info("Please login to chat with the seller");
-                  navigate("/auth");
-                } else {
-                  alert("Chat feature coming soon!");
-                }
-              }}
+              onClick={startChatWithSeller}
             >
               Chat with Seller
             </button>

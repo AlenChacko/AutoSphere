@@ -31,6 +31,8 @@ import MyAds from "./pages/user/MyAds";
 import AllAds from "./pages/user/AllAds";
 import ViewAd from "./pages/user/ViewAd";
 import EditMyAd from "./pages/user/EditMyAd";
+import ChatPage from "./pages/chat/ChatPage";
+import Inbox from "./pages/chat/Inbox";
 
 const App = () => {
   return (
@@ -56,9 +58,15 @@ const App = () => {
             <Route path="/sell-car" element={<SellCar />} />
             <Route path="/your-ads" element={<MyAds />} />
             <Route path="/edit-used-car/:id"  element={<EditMyAd/>}/>
-            
+            <Route path="/chat/:conversationId" element={<ChatPage />} />
+            <Route path="/inbox" element={<Inbox />} />
+
+
+          
           </Route>
         </Route>
+
+
 
         {/* User Auth Route (no Navbar/Footer) */}
         <Route element={<PlainLayout />}>

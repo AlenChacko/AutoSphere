@@ -8,6 +8,7 @@ import { connectDB } from "./config/database.js";
 import { userRouter } from "./routes/user/userRoutes.js";
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 import { adminRouter } from "./routes/admin/adminRoutes.js";
+import { chatRouter } from "./routes/chat/chatRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -28,6 +29,7 @@ app.use(express.json());
 
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/chat", chatRouter);
 
 app.use(notFound);
 app.use(errorHandler);
