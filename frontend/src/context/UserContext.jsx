@@ -314,6 +314,106 @@ export const UserProvider = ({ children }) => {
     return res.data;
   };
 
+  const saveToWishlist = async (carId) => {
+  try {
+    const token = user?.token;
+    if (!token) throw new Error("User not authenticated");
+
+    await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist/${carId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    toast.success("Ad saved to your wishlist.");
+    await fetchUserInfo(); // Refresh updated wishlist
+  } catch (err) {
+    console.error("Failed to save to wishlist", err);
+    toast.error("Failed to save ad.");
+  }
+};
+
+const removeFromWishlist = async (carId) => {
+  try {
+    const token = user?.token;
+    if (!token) throw new Error("User not authenticated");
+
+    await axios.delete(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist/${carId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    toast.info("Ad removed from wishlist.");
+    await fetchUserInfo(); // Refresh updated wishlist
+  } catch (err) {
+    console.error("Failed to remove from wishlist", err);
+    toast.error("Failed to remove ad.");
+  }
+};
+
+const isInWishlist = (carId) => {
+  return userInfo?.wishlist?.includes(carId);
+};
+
+const getWishlist = async () => {
+  try {
+    const token = user?.token;
+    if (!token) throw new Error("User not authenticated");
+
+    const res = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error fetching wishlist:", error);
+    return {
+      success: false,
+      message: error.response?.data?.message || "Failed to load wishlist",
+    };
+  }
+};
+
+const markAsSold = async (carId) => {
+  try {
+    const token = user?.token;
+    if (!token) throw new Error("User not authenticated");
+
+    const res = await axios.patch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/mark-sold/${carId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { success: true, message: res.data?.message || "Marked as sold" };
+  } catch (err) {
+    console.error("Failed to mark as sold:", err);
+    return {
+      success: false,
+      message: err.response?.data?.message || "Failed to mark as sold",
+    };
+  }
+};
+
+
+
+
+
   return (
     <UserContext.Provider
       value={{
@@ -337,6 +437,11 @@ export const UserProvider = ({ children }) => {
         getAllUsedCars,
         getUsedCarById,
         updateUsedCar,
+        saveToWishlist,
+        removeFromWishlist,
+        isInWishlist,
+        getWishlist,
+        markAsSold
       }}
     >
       {children}

@@ -345,3 +345,75 @@ export const updateUsedCar = handler(async (req, res) => {
     usedCar,
   });
 });
+
+export const addToWishlist = handler(async (req, res) => {
+  const userId = req.user._id;
+  const carId = req.params.carId;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  if (!user.wishlist.includes(carId)) {
+    user.wishlist.push(carId);
+    await user.save();
+  }
+
+  res.status(200).json({ success: true, message: "Added to wishlist" });
+});
+
+export const removeFromWishlist = handler(async (req, res) => {
+  const userId = req.user._id;
+  const carId = req.params.carId;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const index = user.wishlist.indexOf(carId);
+  if (index > -1) {
+    user.wishlist.splice(index, 1);
+    await user.save();
+  }
+
+  res.status(200).json({ success: true, message: "Removed from wishlist" });
+});
+
+export const getWishlist = handler(async (req, res) => {
+  const user = await User.findById(req.user._id).populate("wishlist");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user.wishlist);
+});
+
+export const markUsedCarAsSold = handler(async (req, res) => {
+  const userId = req.user._id;
+  const carId = req.params.id;
+
+  const car = await UsedCar.findById(carId);
+
+  if (!car) {
+    res.status(404);
+    throw new Error("Car not found");
+  }
+
+  if (car.postedBy.toString() !== userId.toString()) {
+    res.status(403);
+    throw new Error("You are not authorized to update this ad");
+  }
+
+  car.status = "Sold";
+  await car.save();
+
+  res.status(200).json({ success: true, message: "Car marked as sold" });
+});

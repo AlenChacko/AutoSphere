@@ -7,7 +7,14 @@ import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 const ViewAd = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getUsedCarById, userInfo } = useUser();
+  const {
+    getUsedCarById,
+    userInfo,
+    saveToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+  } = useUser();
+
   const [ad, setAd] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState(null);
@@ -25,15 +32,31 @@ const ViewAd = () => {
     fetchAd();
   }, [id]);
 
+  useEffect(() => {
+    if (ad && userInfo) {
+      setIsSaved(isInWishlist(ad._id));
+    }
+  }, [ad, userInfo]);
+
   const handleImageClick = (clickedImg) => {
     if (!mainImage || clickedImg.url === mainImage.url) return;
     setMainImage(clickedImg);
   };
 
-  const toggleSave = () => {
-    setIsSaved((prev) => !prev);
-    toast.success(!isSaved ? "Saved this ad!" : "Removed from saved ads.");
-    // 👉 Add backend or local storage save logic here if needed
+  const toggleSave = async () => {
+    if (!userInfo) {
+      toast.info("Please login to save ads");
+      navigate("/auth");
+      return;
+    }
+
+    if (!isSaved) {
+      await saveToWishlist(ad._id);
+      setIsSaved(true);
+    } else {
+      await removeFromWishlist(ad._id);
+      setIsSaved(false);
+    }
   };
 
   const isOwner = userInfo?._id === ad?.postedBy?._id;
@@ -68,19 +91,15 @@ const ViewAd = () => {
           </div>
 
           {/* ✅ Save Ad Icon — Only if user is logged in */}
-          {userInfo && (
-            <div
-              className="mt-4 flex items-center gap-2 cursor-pointer text-indigo-600"
-              onClick={toggleSave}
-            >
-              {isSaved ? (
-                <BsBookmarkFill size={20} />
-              ) : (
-                <BsBookmark size={20} />
-              )}
-              <span>{isSaved ? "Saved" : "Save Ad"}</span>
-            </div>
-          )}
+          {userInfo && !isOwner && (
+  <div
+    className="mt-4 flex items-center gap-2 cursor-pointer text-indigo-600"
+    onClick={toggleSave}
+  >
+    {isSaved ? <BsBookmarkFill size={20} /> : <BsBookmark size={20} />}
+    <span>{isSaved ? "Saved" : "Save Ad"}</span>
+  </div>
+)}
         </div>
 
         {/* Info */}

@@ -53,6 +53,13 @@ const userSchema = new mongoose.Schema(
         ref: "TestDriveBooking",
       },
     ],
+
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UsedCar", // Or your actual used car model name
+      },
+    ],
   },
   {
     timestamps: true,

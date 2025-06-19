@@ -4,6 +4,7 @@ import {
   loginUser,
 } from "../../controllers/user/authController.js";
 import {
+  addToWishlist,
   addUsedCar,
   bookTestDrive,
   getAllCars,
@@ -12,6 +13,9 @@ import {
   getUsedCarById,
   getUserInfo,
   getUserTestDrives,
+  getWishlist,
+  markUsedCarAsSold,
+  removeFromWishlist,
   updateProfile,
   updateUsedCar,
 } from "../../controllers/user/userController.js";
@@ -48,3 +52,8 @@ userRouter.put(
   uploadUsedCar.array("images", 5), // Max 5 files
   updateUsedCar
 );
+
+userRouter.post("/wishlist/:carId", userAuth, addToWishlist);
+userRouter.delete("/wishlist/:carId", userAuth, removeFromWishlist);
+userRouter.get("/wishlist", userAuth, getWishlist);
+userRouter.patch("/mark-sold/:id", userAuth, markUsedCarAsSold)
