@@ -62,7 +62,8 @@ const ViewAd = () => {
   const isOwner = userInfo?._id === ad?.postedBy?._id;
 
   if (loading) return <div className="text-center mt-10">Loading ad...</div>;
-  if (!ad) return <div className="text-center mt-10 text-red-500">Ad not found.</div>;
+  if (!ad)
+    return <div className="text-center mt-10 text-red-500">Ad not found.</div>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -92,14 +93,18 @@ const ViewAd = () => {
 
           {/* ✅ Save Ad Icon — Only if user is logged in */}
           {userInfo && !isOwner && (
-  <div
-    className="mt-4 flex items-center gap-2 cursor-pointer text-indigo-600"
-    onClick={toggleSave}
-  >
-    {isSaved ? <BsBookmarkFill size={20} /> : <BsBookmark size={20} />}
-    <span>{isSaved ? "Saved" : "Save Ad"}</span>
-  </div>
-)}
+            <div
+              className="mt-4 flex items-center gap-2 cursor-pointer text-indigo-600"
+              onClick={toggleSave}
+            >
+              {isSaved ? (
+                <BsBookmarkFill size={20} />
+              ) : (
+                <BsBookmark size={20} />
+              )}
+              <span>{isSaved ? "Saved" : "Save Ad"}</span>
+            </div>
+          )}
         </div>
 
         {/* Info */}
@@ -113,7 +118,9 @@ const ViewAd = () => {
 
           <div className="space-y-2 text-gray-700 text-[15px]">
             <p>
-              <span className="text-gray-600 font-medium">Kilometers Driven:</span>{" "}
+              <span className="text-gray-600 font-medium">
+                Kilometers Driven:
+              </span>{" "}
               <span className="font-semibold">{ad.kilometersDriven} km</span>
             </p>
             <p>
@@ -125,7 +132,9 @@ const ViewAd = () => {
               <span className="font-semibold">{ad.transmission}</span>
             </p>
             <p>
-              <span className="text-gray-600 font-medium">Accident History:</span>{" "}
+              <span className="text-gray-600 font-medium">
+                Accident History:
+              </span>{" "}
               <span className="font-semibold">{ad.accidentHistory}</span>
             </p>
             <p>
@@ -143,7 +152,9 @@ const ViewAd = () => {
           {ad.description && (
             <div className="mt-6">
               <h4 className="font-semibold text-gray-800 mb-1">Description</h4>
-              <p className="text-gray-700 whitespace-pre-wrap text-sm">{ad.description}</p>
+              <p className="text-gray-700 whitespace-pre-wrap text-sm">
+                {ad.description}
+              </p>
             </div>
           )}
 
@@ -151,7 +162,8 @@ const ViewAd = () => {
             <p>
               Posted by:{" "}
               <span className="font-medium text-gray-700">
-                {ad.postedBy?.firstName} {ad.postedBy?.lastName || ""} ({ad.postedBy?.email})
+                {ad.postedBy?.firstName} {ad.postedBy?.lastName || ""} (
+                {ad.postedBy?.email})
               </span>
             </p>
             <p>
@@ -169,6 +181,10 @@ const ViewAd = () => {
             >
               Edit Ad
             </button>
+          ) : ad.status?.toLowerCase().trim() === "sold" ? (
+            <div className="mt-6 bg-red-100 border border-red-400 text-red-700 px-6 py-3 rounded-lg text-lg font-bold text-center shadow">
+              🚫 This car is already sold.
+            </div>
           ) : (
             <button
               className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded shadow"

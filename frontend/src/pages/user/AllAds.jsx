@@ -27,7 +27,6 @@ const AllAds = () => {
   useEffect(() => {
     let filtered = [...ads];
 
-    // 🔍 Search filter
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -39,14 +38,12 @@ const AllAds = () => {
       );
     }
 
-    // 💸 Price range filter
     const min = parseInt(priceRange.min);
     const max = parseInt(priceRange.max);
 
     if (!isNaN(min)) filtered = filtered.filter((ad) => ad.price >= min);
     if (!isNaN(max)) filtered = filtered.filter((ad) => ad.price <= max);
 
-    // 📊 Sort order
     if (sortOrder === "lowToHigh") {
       filtered.sort((a, b) => a.price - b.price);
     } else if (sortOrder === "highToLow") {
@@ -65,63 +62,66 @@ const AllAds = () => {
         All Used Cars
       </h2>
 
-      {/* 🔍 Search and Filter Controls */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-  <input
-    type="text"
-    placeholder="Search by company, model, or location..."
-    className="border p-2 rounded col-span-2"
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-  />
+      {/* 🔍 Filter & Search */}
+      <div className="mb-6 max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end w-full">
+        <input
+          type="text"
+          placeholder="Search by company, model, or location..."
+          className="border p-2 rounded w-full"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-  <select
-    className="border p-2 rounded"
-    value={sortOrder}
-    onChange={(e) => setSortOrder(e.target.value)}
-  >
-    <option value="">Sort by Price</option>
-    <option value="lowToHigh">Low → High</option>
-    <option value="highToLow">High → Low</option>
-  </select>
+        <select
+          className="border p-2 rounded w-full"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+        >
+          <option value="">Sort by Price</option>
+          <option value="lowToHigh">Low → High</option>
+          <option value="highToLow">High → Low</option>
+        </select>
 
-  <div className="flex gap-2">
-    <input
-      type="number"
-      placeholder="Min ₹"
-      className="border p-2 rounded w-1/2"
-      value={priceRange.min}
-      onChange={(e) =>
-        setPriceRange({ ...priceRange, min: e.target.value })
-      }
-    />
-    <input
-      type="number"
-      placeholder="Max ₹"
-      className="border p-2 rounded w-1/2"
-      value={priceRange.max}
-      onChange={(e) =>
-        setPriceRange({ ...priceRange, max: e.target.value })
-      }
-    />
-  </div>
+        <div className="flex gap-2 w-full">
+          <input
+            type="number"
+            placeholder="Min ₹"
+            className="border p-2 rounded w-1/2"
+            value={priceRange.min}
+            onChange={(e) =>
+              setPriceRange({ ...priceRange, min: e.target.value })
+            }
+          />
+          <input
+            type="number"
+            placeholder="Max ₹"
+            className="border p-2 rounded w-1/2"
+            value={priceRange.max}
+            onChange={(e) =>
+              setPriceRange({ ...priceRange, max: e.target.value })
+            }
+          />
+        </div>
 
-  {/* 🔄 Clear Filters Button */}
-  <button
-    className="bg-gray-200 hover:bg-gray-300 text-sm px-4 py-2 rounded"
-    onClick={() => {
-      setSearchTerm("");
-      setSortOrder("");
-      setPriceRange({ min: "", max: "" });
-    }}
-  >
-    Clear Filters
-  </button>
-</div>
+        <div className="sm:col-span-2 md:col-span-1">
+          <button
+            className="w-full bg-gray-200 hover:bg-gray-300 text-sm px-4 py-2 rounded"
+            onClick={() => {
+              setSearchTerm("");
+              setSortOrder("");
+              setPriceRange({ min: "", max: "" });
+            }}
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
 
-      {/* 🚫 No Results */}
+      {/* 🛑 No results */}
       {filteredAds.length === 0 ? (
-        <div className="text-center text-gray-500">No cars match your filters.</div>
+        <div className="text-center text-gray-500">
+          No cars match your filters.
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {filteredAds.map((ad) => (
@@ -145,7 +145,8 @@ const AllAds = () => {
                       : "bg-green-600"
                   }`}
                 >
-                  {ad.status?.charAt(0).toUpperCase() + ad.status?.slice(1) ||
+                  {ad.status?.charAt(0).toUpperCase() +
+                    ad.status?.slice(1) ||
                     "Available"}
                 </span>
               </div>
