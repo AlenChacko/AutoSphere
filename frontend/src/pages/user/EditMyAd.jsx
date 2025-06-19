@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 
-const SellCar = () => {
-  const { addUsedCar } = useUser();
+const EditMyAd = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { getUsedCarById, updateUsedCar } = useUser();
 
   const [formData, setFormData] = useState({
     company: "",
@@ -21,11 +22,46 @@ const SellCar = () => {
     district: "",
     state: "",
     phone: "",
-    description: "", // ✅ new field
+    description: "",
   });
 
   const [selectedImages, setSelectedImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    const fetchAd = async () => {
+      const res = await getUsedCarById(id);
+      if (res.success) {
+        const data = res.data;
+        setFormData({
+          company: data.company || "",
+          model: data.model || "",
+          year: data.year || "",
+          kilometersDriven: data.kilometersDriven || "",
+          price: data.price || "",
+          accidentHistory: data.accidentHistory || "No",
+          transmission: data.transmission || "Manual",
+          fuelType: data.fuelType || "Petrol",
+          insuranceAvailable: data.insuranceAvailable || "No",
+          place: data.place || "",
+          district: data.district || "",
+          state: data.state || "",
+          phone: data.phone || "",
+          description: data.description || "",
+        });
+        const previews = data.images.map((img) => ({
+          file: null,
+          url: img.url,
+          existing: true,
+          id: img._id,
+        }));
+        setSelectedImages(previews);
+      } else {
+        toast.error("Failed to load ad");
+      }
+    };
+    fetchAd();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +74,7 @@ const SellCar = () => {
       file,
       url: URL.createObjectURL(file),
     }));
-    setSelectedImages((prev) => [...prev, ...previews].slice(0, 5));
+    setSelectedImages((prev) => [...prev.filter(img => img.existing), ...previews].slice(0, 5));
   };
 
   const removeImage = (index) => {
@@ -58,34 +94,25 @@ const SellCar = () => {
     for (const key in formData) {
       submitData.append(key, formData[key]);
     }
-    selectedImages.forEach((img) => submitData.append("images", img.file));
+
+    selectedImages.forEach((img) => {
+      if (!img.existing && img.file) {
+        submitData.append("images", img.file);
+      }
+    });
+
+    // send the IDs of retained existing images
+    const retainedImageIds = selectedImages.filter((img) => img.existing).map((img) => img.id);
+    submitData.append("existingImageIds", JSON.stringify(retainedImageIds));
+
 
     try {
       setUploading(true);
-      await addUsedCar(submitData);
-      toast.success("Ad posted");
+      await updateUsedCar(id, submitData);
+      toast.success("Ad updated successfully");
       navigate("/your-ads");
-
-      // Reset form
-      setFormData({
-        company: "",
-        model: "",
-        year: "",
-        kilometersDriven: "",
-        price: "",
-        accidentHistory: "No",
-        transmission: "Manual",
-        fuelType: "Petrol",
-        insuranceAvailable: "No",
-        place: "",
-        district: "",
-        state: "",
-        phone: "",
-        description: "", // ✅ reset
-      });
-      setSelectedImages([]);
     } catch (err) {
-      toast.error("Something went wrong while submitting.");
+      toast.error("Failed to update ad");
     } finally {
       setUploading(false);
     }
@@ -94,11 +121,10 @@ const SellCar = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
       <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800">
-        Sell Your Car
+        Edit Your Car Ad
       </h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Fields */}
         <InputField label="Company" name="company" value={formData.company} onChange={handleChange} required />
         <InputField label="Model" name="model" value={formData.model} onChange={handleChange} required />
         <InputField type="number" label="Year" name="year" value={formData.year} onChange={handleChange} required />
@@ -113,7 +139,6 @@ const SellCar = () => {
         <InputField label="State" name="state" value={formData.state} onChange={handleChange} placeholder="e.g. Kerala" required />
         <InputField type="tel" label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} placeholder="e.g. 9876543210" required />
 
-        {/* ✅ Description */}
         <div className="md:col-span-2">
           <label className="block mb-1 font-medium text-gray-700">Description</label>
           <textarea
@@ -127,7 +152,6 @@ const SellCar = () => {
           />
         </div>
 
-        {/* Images */}
         <div className="md:col-span-2">
           <label className="block mb-2 font-medium text-gray-700">
             Upload Car Images (Max 5)
@@ -155,14 +179,13 @@ const SellCar = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
         <div className="md:col-span-2">
           <button
             type="submit"
             disabled={uploading}
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
           >
-            {uploading ? "Submitting..." : "Submit Car Details"}
+            {uploading ? "Updating..." : "Update Ad"}
           </button>
         </div>
       </form>
@@ -170,7 +193,6 @@ const SellCar = () => {
   );
 };
 
-// Reusable Components
 const InputField = ({ label, name, value, onChange, type = "text", placeholder = "", required = false }) => (
   <div>
     <label className="block mb-1 font-medium text-gray-700">{label}</label>
@@ -204,4 +226,4 @@ const SelectField = ({ label, name, value, onChange, options }) => (
   </div>
 );
 
-export default SellCar;
+export default EditMyAd;

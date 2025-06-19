@@ -28,6 +28,9 @@ import ManageTestDrives from "./pages/admin/ManageTestDrives";
 import SearchResults from "./components/user/SearchResults";
 import SellCar from "./pages/user/SellCar";
 import MyAds from "./pages/user/MyAds";
+import AllAds from "./pages/user/AllAds";
+import ViewAd from "./pages/user/ViewAd";
+import EditMyAd from "./pages/user/EditMyAd";
 
 const App = () => {
   return (
@@ -40,8 +43,9 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/brands/:brand" element={<Cars />} />
           <Route path="/car/:id" element={<CarDetails />} />
-
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/used-cars" element={<AllAds />} />
+            <Route path="/view-ad/:id" element={<ViewAd />} />
 
           {/* ✅ Protected User Route: Test Drive Booking */}
           <Route element={<ProtectedRoute />}>
@@ -51,6 +55,8 @@ const App = () => {
             <Route path="/test-drives" element={<TestDrives />} />
             <Route path="/sell-car" element={<SellCar />} />
             <Route path="/your-ads" element={<MyAds />} />
+            <Route path="/edit-used-car/:id"  element={<EditMyAd/>}/>
+            
           </Route>
         </Route>
 

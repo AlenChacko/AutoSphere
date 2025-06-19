@@ -17,6 +17,16 @@ const usedCarSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    district: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    state: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     phone: {
       type: String,
       required: true,
@@ -55,7 +65,12 @@ const usedCarSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
-      min: 1000, // you can adjust minimum based on your use case
+      min: 1000,
+    },
+    description: {
+      type: String,
+      trim: true,
+      default: "",
     },
     images: [
       {

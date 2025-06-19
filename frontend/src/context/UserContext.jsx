@@ -211,60 +211,108 @@ export const UserProvider = ({ children }) => {
     }
   };
 
- const addUsedCar = async (formData) => {
-  try {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const token = storedUser?.token;
+  const addUsedCar = async (formData) => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const token = storedUser?.token;
 
-    if (!token) throw new Error("User not authenticated");
+      if (!token) throw new Error("User not authenticated");
 
-    const { data } = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/add-used-car`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      }
-    );
-    
-    return data;
-  } catch (error) {
-    console.error("❌ Error adding used car:", error.response?.data || error);
-    toast.error(
-      error.response?.data?.message ||
-        "Failed to list your car. Please try again."
-    );
-    throw error;
-  }
-};
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/add-used-car`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
 
-const getMyUsedCars = async () => {
-  try {
+      return data;
+    } catch (error) {
+      console.error("❌ Error adding used car:", error.response?.data || error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to list your car. Please try again."
+      );
+      throw error;
+    }
+  };
+
+  const getMyUsedCars = async () => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/my-used-cars`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return { success: true, data: res.data };
+    } catch (err) {
+      console.error("Failed to fetch my ads:", err);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Failed to fetch your ads",
+      };
+    }
+  };
+
+  const getAllUsedCars = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/used-cars`
+      );
+
+      return { success: true, data: res.data };
+    } catch (error) {
+      console.error("Failed to fetch all used cars:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to fetch used cars",
+      };
+    }
+  };
+
+  const getUsedCarById = async (id) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/used-car/${id}`
+      );
+
+      return { success: true, data: res.data };
+    } catch (error) {
+      console.error("Error fetching used car:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error fetching used car",
+      };
+    }
+  };
+
+  const updateUsedCar = async (id, updatedData) => {
     const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
 
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/my-used-cars`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log(res.data)
+    const res = await axios({
+      method: "put",
+      url: `${import.meta.env.VITE_BACKEND_URL}/api/user/update/used-car/${id}`,
+      data: updatedData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Do NOT manually set Content-Type
+      },
+      withCredentials: true, // optional, if you're using cookies
+    });
 
-    return { success: true, data: res.data };
-  } catch (err) {
-    console.error("Failed to fetch my ads:", err);
-    return {
-      success: false,
-      message: err.response?.data?.message || "Failed to fetch your ads",
-    };
-  }
-};
+    return res.data;
+  };
 
   return (
     <UserContext.Provider
@@ -286,6 +334,9 @@ const getMyUsedCars = async () => {
         searchCars,
         addUsedCar,
         getMyUsedCars,
+        getAllUsedCars,
+        getUsedCarById,
+        updateUsedCar,
       }}
     >
       {children}

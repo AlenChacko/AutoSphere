@@ -173,11 +173,12 @@ export const addUsedCar = handler(async (req, res) => {
     state,
     phone,
     price,
+    description, // ✅ include description
   } = req.body;
 
   const imageFiles = req?.files || [];
 
-  // ✅ Upload each image to Cloudinary
+  // ✅ Upload images to Cloudinary
   const images = await Promise.all(
     imageFiles.map(async (file) => {
       const result = await cloudinary.uploader.upload(file.path, {
@@ -228,6 +229,7 @@ export const addUsedCar = handler(async (req, res) => {
     state: state.trim(),
     phone: phone.trim(),
     price: Number(price),
+    description: description?.trim() || "", // ✅ add description safely
     images,
     postedBy: req.user._id,
   });
@@ -248,4 +250,98 @@ export const getMyUsedCars = handler(async (req, res) => {
   });
 
   res.status(200).json(myAds);
+});
+
+export const getAllUsedCars = handler(async (req, res) => {
+  const cars = await UsedCar.find({}).sort({ createdAt: -1 });
+  res.status(200).json(cars);
+});
+
+export const getUsedCarById = handler(async (req, res) => {
+  const usedCar = await UsedCar.findById(req.params.id).populate("postedBy", "firstName lastName email")
+  if (!usedCar) {
+    return res.status(404).json({ message: "Ad not found" });
+  }
+  res.status(200).json(usedCar);
+});
+
+export const updateUsedCar = handler(async (req, res) => {
+  const usedCar = await UsedCar.findById(req.params.id);
+
+  if (!usedCar) {
+    return res.status(404).json({ message: "Used car not found" });
+  }
+
+  // 🔒 Check if the logged-in user is the owner
+  if (usedCar.postedBy.toString() !== req.user._id.toString()) {
+    return res.status(403).json({ message: "Unauthorized" });
+  }
+
+  const {
+    company,
+    model,
+    year,
+    kilometersDriven,
+    accidentHistory,
+    transmission,
+    fuelType,
+    insuranceAvailable,
+    place,
+    district,
+    state,
+    phone,
+    price,
+    description,
+  } = req.body;
+
+  console.log("usedcarrr",req.body)
+
+  const imageFiles = req.files || [];
+
+  // 🔄 Upload new images (if any)
+  let newImages = [];
+  if (imageFiles.length > 0) {
+    // 🗑️ Delete old images from Cloudinary
+    for (const img of usedCar.images) {
+      await cloudinary.uploader.destroy(img.public_id);
+    }
+
+    // ⬆️ Upload new images
+    newImages = await Promise.all(
+      imageFiles.map(async (file) => {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: "autosphere/used-cars",
+        });
+
+        return {
+          public_id: result.public_id,
+          url: result.secure_url,
+        };
+      })
+    );
+  }
+
+  // 📝 Update fields
+  usedCar.company = company?.trim() || usedCar.company;
+  usedCar.model = model?.trim() || usedCar.model;
+  usedCar.year = year || usedCar.year;
+  usedCar.kilometersDriven = kilometersDriven || usedCar.kilometersDriven;
+  usedCar.accidentHistory = accidentHistory || usedCar.accidentHistory;
+  usedCar.transmission = transmission || usedCar.transmission;
+  usedCar.fuelType = fuelType || usedCar.fuelType;
+  usedCar.insuranceAvailable = insuranceAvailable || usedCar.insuranceAvailable;
+  usedCar.place = place?.trim() || usedCar.place;
+  usedCar.district = district?.trim() || usedCar.district;
+  usedCar.state = state?.trim() || usedCar.state;
+  usedCar.phone = phone?.trim() || usedCar.phone;
+  usedCar.price = price || usedCar.price;
+  usedCar.description = description?.trim() || usedCar.description;
+  if (newImages.length > 0) usedCar.images = newImages;
+
+  await usedCar.save();
+
+  res.status(200).json({
+    message: "Used car updated successfully",
+    usedCar,
+  });
 });
