@@ -33,8 +33,16 @@ import ViewAd from "./pages/user/ViewAd";
 import EditMyAd from "./pages/user/EditMyAd";
 import ChatPage from "./pages/chat/ChatPage";
 import Inbox from "./pages/chat/Inbox";
+import { useUser } from "./context/UserContext";
+import { useEffect } from "react";
 
 const App = () => {
+  const { getUserConversations, user } = useUser();
+  useEffect(() => {
+    if (user) {
+      getUserConversations(); // 👈 fetch count on load
+    }
+  }, [user]);
   return (
     <>
       <ToastContainer position="top-right" autoClose={1000} />

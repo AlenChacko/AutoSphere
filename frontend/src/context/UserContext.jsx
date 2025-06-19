@@ -14,6 +14,8 @@ export const UserProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [filteredCars, setFilteredCars] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const loginUser = (userData) => {
     setUser(userData);
@@ -315,233 +317,232 @@ export const UserProvider = ({ children }) => {
   };
 
   const saveToWishlist = async (carId) => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
 
-    await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist/${carId}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist/${carId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Ad saved to your wishlist.");
+      await fetchUserInfo(); // Refresh updated wishlist
+    } catch (err) {
+      console.error("Failed to save to wishlist", err);
+      toast.error("Failed to save ad.");
+    }
+  };
+
+  const removeFromWishlist = async (carId) => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist/${carId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.info("Ad removed from wishlist.");
+      await fetchUserInfo(); // Refresh updated wishlist
+    } catch (err) {
+      console.error("Failed to remove from wishlist", err);
+      toast.error("Failed to remove ad.");
+    }
+  };
+
+  const isInWishlist = (carId) => {
+    return userInfo?.wishlist?.includes(carId);
+  };
+
+  const getWishlist = async () => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return { success: true, data: res.data };
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to load wishlist",
+      };
+    }
+  };
+
+  const markAsSold = async (carId) => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/mark-sold/${carId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return { success: true, message: res.data?.message || "Marked as sold" };
+    } catch (err) {
+      console.error("Failed to mark as sold:", err);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Failed to mark as sold",
+      };
+    }
+  };
+
+  const createConversation = async (sellerId, adId) => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/chat/start`,
+        { sellerId, adId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return res.data; // contains conversation._id
+    } catch (error) {
+      console.error("❌ Error creating conversation:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed",
+      };
+    }
+  };
+
+  const getConversationById = async (conversationId) => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/chat/conversations/${conversationId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return { success: true, data: res.data.conversation };
+    } catch (error) {
+      console.error("❌ Failed to fetch conversation:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to fetch chat",
+      };
+    }
+  };
+
+  const getMessages = async (conversationId) => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/chat/message/${conversationId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return { success: true, data: res.data.messages };
+    } catch (error) {
+      console.error("❌ Error fetching messages:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to load messages",
+      };
+    }
+  };
+
+  const sendMessage = async (conversationId, text, image = null) => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/chat/message`,
+        {
+          conversationId, // ✅ should be a string only
+          text,
+          image,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return { success: true, data: res.data.message };
+    } catch (error) {
+      console.error("❌ Error sending message:", error.response?.data || error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to send message",
+      };
+    }
+  };
+
+  const getUserConversations = async () => {
+    try {
+      const token = user?.token;
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/chat`, // ✅ Ensure this endpoint includes unread logic
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.data.success) {
+        setConversations(res.data.conversations); // ✅ You must have this state in context
+        setUnreadCount(res.data.unreadTotal); // ✅ Store unread count
       }
-    );
-    toast.success("Ad saved to your wishlist.");
-    await fetchUserInfo(); // Refresh updated wishlist
-  } catch (err) {
-    console.error("Failed to save to wishlist", err);
-    toast.error("Failed to save ad.");
-  }
-};
 
-const removeFromWishlist = async (carId) => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    await axios.delete(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist/${carId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    toast.info("Ad removed from wishlist.");
-    await fetchUserInfo(); // Refresh updated wishlist
-  } catch (err) {
-    console.error("Failed to remove from wishlist", err);
-    toast.error("Failed to remove ad.");
-  }
-};
-
-const isInWishlist = (carId) => {
-  return userInfo?.wishlist?.includes(carId);
-};
-
-const getWishlist = async () => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/wishlist`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return { success: true, data: res.data };
-  } catch (error) {
-    console.error("Error fetching wishlist:", error);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Failed to load wishlist",
-    };
-  }
-};
-
-const markAsSold = async (carId) => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await axios.patch(
-      `${import.meta.env.VITE_BACKEND_URL}/api/user/mark-sold/${carId}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return { success: true, message: res.data?.message || "Marked as sold" };
-  } catch (err) {
-    console.error("Failed to mark as sold:", err);
-    return {
-      success: false,
-      message: err.response?.data?.message || "Failed to mark as sold",
-    };
-  }
-};
-
-const createConversation = async (sellerId, adId) => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/chat/start`,
-      { sellerId, adId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return res.data; // contains conversation._id
-  } catch (error) {
-    console.error("❌ Error creating conversation:", error);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Failed",
-    };
-  }
-};
-
-const getConversationById = async (conversationId) => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/chat/conversations/${conversationId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    return { success: true, data: res.data.conversation };
-  } catch (error) {
-    console.error("❌ Failed to fetch conversation:", error);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Failed to fetch chat",
-    };
-  }
-};
-
-const getMessages = async (conversationId) => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/chat/message/${conversationId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return { success: true, data: res.data.messages };
-  } catch (error) {
-    console.error("❌ Error fetching messages:", error);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Failed to load messages",
-    };
-  }
-};
-
-const sendMessage = async (conversationId, text, image = null) => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/chat/message`,
-      {
-        conversationId, // ✅ should be a string only
-        text,
-        image,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return { success: true, data: res.data.message };
-  } catch (error) {
-    console.error("❌ Error sending message:", error.response?.data || error);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Failed to send message",
-    };
-  }
-};
-
-const getUserConversations = async () => {
-  try {
-    const token = user?.token;
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/chat`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return { success: true, data: res.data.conversations };
-  } catch (error) {
-    console.error("❌ Failed to fetch user conversations:", error);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Failed to load inbox",
-    };
-  }
-};
-
-
-
-
-
-
-
-
-
-
+      return res.data;
+    } catch (error) {
+      console.error("❌ Failed to fetch user conversations:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to load inbox",
+      };
+    }
+  };
 
   return (
     <UserContext.Provider
@@ -576,6 +577,8 @@ const getUserConversations = async () => {
         getMessages,
         sendMessage,
         getUserConversations,
+        conversations,
+        unreadCount,
       }}
     >
       {children}

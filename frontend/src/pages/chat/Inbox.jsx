@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
+import { BsCheck2 } from "react-icons/bs"; // ✔️ icon
 
 const Inbox = () => {
   const { getUserConversations, userInfo } = useUser();
@@ -9,14 +10,17 @@ const Inbox = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchInbox = async () => {
-      const res = await getUserConversations();
-      if (res.success) {
-        setConversations(res.data);
-      }
-    };
-    fetchInbox();
-  }, []);
+  const fetchInbox = async () => {
+    const res = await getUserConversations();
+    if (res.success && Array.isArray(res.conversations)) {
+      setConversations(res.conversations); // ✅ FIXED: access `conversations` from res
+    } else {
+      setConversations([]);
+    }
+  };
+  fetchInbox();
+}, []);
+
 
   const formatTime = (isoString) => {
     const date = new Date(isoString);
@@ -37,8 +41,21 @@ const Inbox = () => {
       ) : (
         <div className="space-y-4">
           {conversations.map((convo) => {
-            const buyer = convo.participants.find(p => p._id !== userInfo?._id);
+            const buyer = convo.participants?.find(
+              (p) => p._id !== userInfo?._id
+            );
             const lastMsg = convo.lastMessage;
+            const isUnread =
+              lastMsg && lastMsg.sender?._id !== userInfo?._id;
+
+            let displayText = "";
+            if (lastMsg?.text) {
+              displayText = lastMsg.text;
+            } else if (lastMsg?.image) {
+              displayText = "📷 Photo";
+            } else {
+              displayText = "No message yet";
+            }
 
             return (
               <div
@@ -60,9 +77,20 @@ const Inbox = () => {
                   <p className="font-medium text-gray-800">
                     {buyer?.firstName} {buyer?.lastName}
                   </p>
-                  <p className="text-sm text-gray-600 truncate">
-                    {lastMsg?.text || "Image 📷"}
-                  </p>
+                  <div className="flex items-center gap-1">
+                    <p
+                      className={`text-sm truncate ${
+                        isUnread
+                          ? "font-semibold text-black"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {displayText}
+                    </p>
+                    {lastMsg?.sender?._id === userInfo?._id && (
+                      <BsCheck2 className="text-gray-400 text-sm" />
+                    )}
+                  </div>
                 </div>
 
                 <div className="text-xs text-gray-400">

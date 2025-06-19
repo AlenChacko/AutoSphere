@@ -35,7 +35,33 @@ export const getUserConversations = handler(async (req, res) => {
     .populate("participants", "firstName lastName profilePic email")
     .sort({ updatedAt: -1 });
 
-  res.status(200).json({ success: true, conversations });
+  // Attach unread count to each conversation
+  const updatedConversations = await Promise.all(
+    conversations.map(async (convo) => {
+      const unreadCount = await Message.countDocuments({
+        conversation: convo._id,
+        sender: { $ne: userId },
+        isRead: false,
+      });
+
+      return {
+        ...convo.toObject(),
+        unreadCount,
+      };
+    })
+  );
+
+  // Count total unread messages for navbar badge
+  const totalUnread = updatedConversations.reduce(
+    (acc, convo) => acc + convo.unreadCount,
+    0
+  );
+
+  res.status(200).json({
+    success: true,
+    conversations: updatedConversations,
+    unreadTotal: totalUnread,
+  });
 });
 
 // 3. Send Message
@@ -43,28 +69,41 @@ export const sendMessage = handler(async (req, res) => {
   const { conversationId, text, image } = req.body;
   const senderId = req.user._id;
 
-  console.log("conversationId:", conversationId);
-  console.log("senderId:", senderId);
-  console.log("text:", text);
-
   const message = await Message.create({
-    conversation: new mongoose.Types.ObjectId(conversationId), // ✅ fix here
+    conversation: new mongoose.Types.ObjectId(conversationId),
     sender: senderId,
     text,
     image,
   });
 
+  // Update lastMessage in the conversation
   await Conversation.findByIdAndUpdate(conversationId, {
     updatedAt: Date.now(),
+    lastMessage: {
+      text: text || "",
+      image: image || "",
+      sender: senderId,
+      createdAt: message.createdAt,
+    },
   });
 
   res.status(201).json({ success: true, message });
 });
 
-
 // 4. Get Messages for a Conversation
 export const getMessages = handler(async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // conversation ID
+  const userId = req.user._id;
+
+  // Mark all unread messages not sent by the current user as read
+  await Message.updateMany(
+    {
+      conversation: id,
+      sender: { $ne: userId },
+      isRead: false,
+    },
+    { $set: { isRead: true } }
+  );
 
   const messages = await Message.find({ conversation: id })
     .populate("sender", "firstName lastName profilePic")
@@ -72,7 +111,6 @@ export const getMessages = handler(async (req, res) => {
 
   res.status(200).json({ success: true, messages });
 });
-
 
 export const getConversationById = handler(async (req, res) => {
   const conversation = await Conversation.findById(req.params.id)

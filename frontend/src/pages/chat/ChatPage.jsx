@@ -3,15 +3,13 @@ import { useParams } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import { FaUserCircle } from "react-icons/fa";
 import { PaperClipIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { io } from "socket.io-client";
+
+const socket = io(import.meta.env.VITE_BACKEND_URL); // 🧠 Make sure this is http://localhost:5000 or your deployed domain
 
 const ChatPage = () => {
   const { conversationId } = useParams();
-  const {
-    getConversationById,
-    getMessages,
-    sendMessage,
-    userInfo,
-  } = useUser();
+  const { getConversationById, getMessages, sendMessage, userInfo } = useUser();
 
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -21,6 +19,13 @@ const ChatPage = () => {
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // ⬇️ JOIN SOCKET ROOM
+  useEffect(() => {
+    if (!conversationId) return;
+    socket.emit("joinRoom", conversationId);
+  }, [conversationId]);
+
+  // ⬇️ LOAD CONVERSATION AND MESSAGES
   useEffect(() => {
     const fetchData = async () => {
       const convoRes = await getConversationById(conversationId);
@@ -33,47 +38,71 @@ const ChatPage = () => {
     fetchData();
   }, [conversationId]);
 
+  // ⬇️ AUTO SCROLL TO LATEST MESSAGE
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const ad = conversation?.ad;
-  const seller = conversation?.participants?.find(
-    (p) => p._id !== userInfo?._id
-  );
+  // ⬇️ LISTEN FOR NEW INCOMING MESSAGE
+  useEffect(() => {
+    socket.on("newMessage", (incomingMsg) => {
+      setMessages((prev) => [...prev, incomingMsg]);
+    });
 
+    return () => {
+      socket.off("newMessage");
+    };
+  }, []);
+
+  const ad = conversation?.ad;
+  const seller = conversation?.participants?.find((p) => p._id !== userInfo?._id);
   const adImage = ad?.images?.[0]?.url || "https://placehold.co/60x60";
 
+  // ⬇️ SEND MESSAGE
   const handleSend = async () => {
-    if (!newMessage.trim() && !selectedImage) return;
+  if (!newMessage.trim() && !selectedImage) return;
 
-    let imageUrl = null;
+  let imageUrl = null;
 
-    // TODO: Upload image to Cloudinary here if selectedImage exists
-    if (selectedImage) {
-      // Example: simulate URL
-      imageUrl = previewURL;
+  if (selectedImage) {
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedImage);
+      formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+
+      const res = await fetch(import.meta.env.VITE_CLOUDINARY_UPLOAD_URL, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      imageUrl = data.secure_url;
+    } catch (error) {
+      console.error("❌ Error uploading image:", error);
     }
+  }
 
-    const res = await sendMessage(conversationId, newMessage.trim(), imageUrl);
+  const res = await sendMessage(conversationId, newMessage.trim(), imageUrl);
 
-    if (res.success) {
-      const newMsg = {
-        ...res.data,
-        sender: {
-          _id: userInfo._id,
-          profilePic: userInfo.profilePic,
-          firstName: userInfo.firstName,
-          lastName: userInfo.lastName,
-        },
-      };
+  if (res.success) {
+    const newMsg = {
+      ...res.data,
+      sender: {
+        _id: userInfo._id,
+        profilePic: userInfo.profilePic,
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
+      },
+    };
 
-      setMessages((prev) => [...prev, newMsg]);
-      setNewMessage("");
-      setSelectedImage(null);
-      setPreviewURL(null);
-    }
-  };
+    setMessages((prev) => [...prev, newMsg]);
+    socket.emit("sendMessage", { roomId: conversationId, message: newMsg });
+
+    setNewMessage("");
+    setSelectedImage(null);
+    setPreviewURL(null);
+  }
+};
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleSend();
@@ -148,7 +177,6 @@ const ChatPage = () => {
 
       {/* Chat input */}
       <div className="flex flex-col gap-2 border-t pt-3">
-        {/* Image preview row */}
         {previewURL && (
           <div className="relative w-fit">
             <img src={previewURL} alt="preview" className="w-24 h-24 object-cover rounded border" />
@@ -180,7 +208,6 @@ const ChatPage = () => {
             className="flex-1 border rounded px-3 py-2 text-sm focus:outline-none"
           />
 
-          {/* 📎 image upload */}
           <button onClick={triggerFileInput}>
             <PaperClipIcon className="w-5 h-5 text-gray-600" />
           </button>
@@ -192,15 +219,8 @@ const ChatPage = () => {
             onChange={handleImageSelect}
           />
 
-          {/* send icon */}
           <button onClick={handleSend}>
-            <svg
-              className="w-5 h-5 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M4 16v4h4l10-10-4-4L4 16z" />
             </svg>
           </button>

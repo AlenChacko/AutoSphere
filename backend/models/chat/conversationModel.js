@@ -14,6 +14,15 @@ const conversationSchema = new mongoose.Schema(
       ref: "UsedCar",
       required: true,
     },
+    lastMessage: {
+      text: String,
+      image: String,
+      sender: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      createdAt: Date,
+    },
   },
   { timestamps: true }
 );

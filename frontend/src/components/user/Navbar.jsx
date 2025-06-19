@@ -1,14 +1,20 @@
 import { useState } from "react";
-import { FaSearch, FaUserCircle, FaBars, FaTimes, FaEnvelope } from "react-icons/fa";
+import {
+  FaSearch,
+  FaUserCircle,
+  FaBars,
+  FaTimes,
+  FaEnvelope,
+} from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
-const messageCount = 5
+const messageCount = 5;
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const { user, logoutUser } = useUser(); // Assuming messageCount is from context
+  const { user, logoutUser, unreadCount } = useUser(); // Assuming messageCount is from context
   const navigate = useNavigate();
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
@@ -42,104 +48,103 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 text-lg">
-  {user && (
-    <Link
-      to="/sell-car"
-      className="text-gray-700 hover:text-blue-600 font-medium"
-    >
-      SELL CARS
-    </Link>
-  )}
+          {user && (
+            <Link
+              to="/sell-car"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              SELL CARS
+            </Link>
+          )}
 
-  <Link
-    to="/used-cars"
-    className="text-gray-700 hover:text-blue-600 font-medium"
-  >
-    USED CARS
-  </Link>
-
-  {/* 🔍 Search Input */}
-  <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-    <input
-      type="text"
-      placeholder="Search cars..."
-      className="px-4 py-2 outline-none text-sm"
-    />
-    <button className="bg-blue-600 p-2 text-white">
-      <FaSearch />
-    </button>
-  </div>
-
-  {/* ✅ Messages – only if logged in */}
-  {user && (
-    <Link
-      to="/inbox"
-      className="relative flex items-center gap-1 text-gray-700 hover:text-blue-600 font-medium"
-    >
-      <FaEnvelope />
-      Inbox
-      {messageCount > 0 && (
-        <span className="ml-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
-          {messageCount}
-        </span>
-      )}
-    </Link>
-  )}
-
-  {/* Profile or Login */}
-  {user ? (
-    <div className="relative">
-      <button
-        onClick={toggleDropdown}
-        className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
-      >
-        {user?.profilePic?.url ? (
-          <img
-            src={user.profilePic.url}
-            alt="Profile"
-            className="w-8 h-8 rounded-full object-cover"
-          />
-        ) : (
-          <FaUserCircle size={28} />
-        )}
-        <span className="font-medium">
-          {user.firstName} {user.lastName}
-        </span>
-      </button>
-
-      {isDropdownOpen && (
-        <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
           <Link
-            to="/profile"
-            className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+            to="/used-cars"
+            className="text-gray-700 hover:text-blue-600 font-medium"
           >
-            Profile
+            USED CARS
           </Link>
-          <Link
-            to="/wishlist"
-            className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-          >
-            Wishlist
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-700"
-          >
-            Logout
-          </button>
+
+          {/* 🔍 Search Input */}
+          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+            <input
+              type="text"
+              placeholder="Search cars..."
+              className="px-4 py-2 outline-none text-sm"
+            />
+            <button className="bg-blue-600 p-2 text-white">
+              <FaSearch />
+            </button>
+          </div>
+
+          {/* ✅ Messages – only if logged in */}
+          {user && (
+            <Link
+              to="/inbox"
+              className="relative flex items-center gap-1 text-gray-700 hover:text-blue-600 font-medium"
+            >
+              <FaEnvelope />
+              Inbox
+              {unreadCount  > 0 && (
+                <span className="ml-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
+                  {unreadCount }
+                </span>
+              )}
+            </Link>
+          )}
+
+          {/* Profile or Login */}
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={toggleDropdown}
+                className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
+              >
+                {user?.profilePic?.url ? (
+                  <img
+                    src={user.profilePic.url}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUserCircle size={28} />
+                )}
+                <span className="font-medium">
+                  {user.firstName} {user.lastName}
+                </span>
+              </button>
+
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+                  >
+                    Wishlist
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-700"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to="/auth"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              Login
+            </Link>
+          )}
         </div>
-      )}
-    </div>
-  ) : (
-    <Link
-      to="/auth"
-      className="text-gray-700 hover:text-blue-600 font-medium"
-    >
-      Login
-    </Link>
-  )}
-</div>
-
       </div>
 
       {/* Mobile Menu */}
@@ -168,9 +173,9 @@ const Navbar = () => {
             >
               <FaEnvelope />
               Inbox
-              {messageCount > 0 && (
+              {unreadCount  > 0 && (
                 <span className="ml-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  {messageCount}
+                  {unreadCount }
                 </span>
               )}
             </Link>
