@@ -162,8 +162,7 @@ const ViewAd = () => {
             <p>
               Posted by:{" "}
               <span className="font-medium text-gray-700">
-                {ad.postedBy?.firstName} {ad.postedBy?.lastName || ""} (
-                {ad.postedBy?.email})
+                {ad.postedBy?.firstName} {ad.postedBy?.lastName || ""} 
               </span>
             </p>
             <p>
