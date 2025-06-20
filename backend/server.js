@@ -21,7 +21,10 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: "https://auto-sphere-two.vercel.app",
+    origin: [
+    "http://localhost:5173", 
+    "https://auto-sphere-two.vercel.app"
+  ],
     credentials: true,
   })
 );
