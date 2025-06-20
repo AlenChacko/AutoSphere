@@ -2,7 +2,7 @@ import handler from "express-async-handler";
 import Car from "../../models/admin/carModel.js";
 import User from "../../models/user/userModel.js";
 import UsedCar from '../../models/user/usedCarModel.js'
-import TestDriveBooking from "../../models/user/testdriveModel.js";
+import TestDriveBooking from "../../models/user/testDriveModel.js";
 import cloudinary from '../../utils/cloudinary.js'
 
 export const getAllCars = handler(async (req, res) => {
