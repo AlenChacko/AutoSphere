@@ -21,7 +21,7 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://auto-sphere-two.vercel.app",
     credentials: true,
   })
 );
@@ -44,7 +44,7 @@ const server = http.createServer(app);
 // ⬇️ Socket.IO Setup
 const io = new Server(server, {
   cors: {
-    origin: "https://auto-sphere-two.vercel.app", // your frontend
+    origin: "https://auto-sphere-two.vercel.app", 
     methods: ["GET", "POST"],
     credentials: true,
   },
