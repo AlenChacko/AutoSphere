@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import handler from "express-async-handler";
 import Car from "../../models/admin/carModel.js";
-import TestDriveBooking from "../../models/user/testdriveModel.js";
+import TestDriveBooking from "../../models/user/testDriveModel.js";
 
 export const addCars = handler(async (req, res) => {
   const {
@@ -132,8 +132,7 @@ export const deleteCar = handler(async (req, res) => {
 
     for (const image of car.images) {
       try {
-        const publicId =
-          typeof image === "string" ? image : image.public_id;
+        const publicId = typeof image === "string" ? image : image.public_id;
         if (!publicId) {
           console.warn("⚠️ Invalid image format:", image);
           continue;
