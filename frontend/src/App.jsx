@@ -35,6 +35,7 @@ import ChatPage from "./pages/chat/ChatPage";
 import Inbox from "./pages/chat/Inbox";
 import { useUser } from "./context/UserContext";
 import { useEffect } from "react";
+import ResetPasswordPage from "./pages/user/ResetPasswordPage";
 
 const App = () => {
   const { getUserConversations, user } = useUser();
@@ -68,6 +69,7 @@ const App = () => {
             <Route path="/edit-used-car/:id"  element={<EditMyAd/>}/>
             <Route path="/chat/:conversationId" element={<ChatPage />} />
             <Route path="/inbox" element={<Inbox />} />
+            <Route path="/reset-password/:id" element={<ResetPasswordPage />} />
 
 
           

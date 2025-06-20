@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FiEdit } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import profile from "../../assets/images/other/profile.avif";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
@@ -8,9 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const { userInfo, loadingUser, updateUserProfile } = useUser();
-
- 
-
+  const navigate = useNavigate()
   const [profileImage, setProfileImage] = useState(null);
   const [profileFile, setProfileFile] = useState(null); // To store actual file for upload
   const [formData, setFormData] = useState({
@@ -52,8 +50,8 @@ const ProfilePage = () => {
       });
 
       if (userInfo.profilePic?.url) {
-  setProfileImage(userInfo.profilePic.url); // ✅ Correct
-}
+        setProfileImage(userInfo.profilePic.url); // ✅ Correct
+      }
     }
   }, [userInfo]);
 
@@ -270,7 +268,10 @@ const ProfilePage = () => {
         </button>
 
         {/* Reset Password */}
-        <button className="w-full mt-2 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition">
+        <button
+          className="w-full mt-2 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition"
+          onClick={() => navigate(`/reset-password/${userInfo?._id}`)}
+        >
           Reset Password
         </button>
       </div>

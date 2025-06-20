@@ -25,3 +25,17 @@ export const registerSchema = Yup.object({
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Please confirm your password"),
 });
+
+
+export const resetPasswordSchema = Yup.object({
+  currentPassword: Yup.string().required("Current password is required"),
+  newPassword: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .max(12, "Password must be at most 12 characters")
+    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .matches(/[0-9]/, "Password must contain at least one number")
+    .required("New password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
+    .required("Please confirm your new password"),
+});

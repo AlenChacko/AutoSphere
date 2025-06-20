@@ -2,6 +2,7 @@ import express from "express";
 import {
   registerUser,
   loginUser,
+  resetPassword,
 } from "../../controllers/user/authController.js";
 import {
   addToWishlist,
@@ -57,3 +58,4 @@ userRouter.post("/wishlist/:carId", userAuth, addToWishlist);
 userRouter.delete("/wishlist/:carId", userAuth, removeFromWishlist);
 userRouter.get("/wishlist", userAuth, getWishlist);
 userRouter.patch("/mark-sold/:id", userAuth, markUsedCarAsSold)
+userRouter.put("/reset-password/:id", userAuth, resetPassword);

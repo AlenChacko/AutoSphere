@@ -544,6 +544,35 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+const resetPassword = async (id, { currentPassword, newPassword }) => {
+  try {
+    const token = user?.token;
+    if (!token) throw new Error("User not authenticated");
+
+    const res = await axios.put(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/reset-password/${id}`,
+      { currentPassword, newPassword },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    toast.success("Password changed! Please login with your new password.");
+    logoutUser(); // ✅ Clear user session
+    window.location.href = "/auth"; // or use navigate("/login") if in a component
+
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Error resetting password:", error);
+    toast.error(error.response?.data?.message || "Failed to reset password");
+    return { success: false };
+  }
+};
+
+
+
   return (
     <UserContext.Provider
       value={{
@@ -579,6 +608,7 @@ export const UserProvider = ({ children }) => {
         getUserConversations,
         conversations,
         unreadCount,
+        resetPassword
       }}
     >
       {children}

@@ -88,3 +88,34 @@ export const loginUser = handler(async (req, res) => {
 });
 
 });
+
+export const resetPassword = handler(async (req, res) => {
+  const { id } = req.params;
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    res.status(400);
+    throw new Error("All fields are required");
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    res.status(401);
+    throw new Error("Current password is incorrect");
+  }
+
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedNewPassword;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Password updated successfully",
+  });
+});
