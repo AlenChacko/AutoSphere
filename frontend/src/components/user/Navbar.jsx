@@ -25,8 +25,6 @@ const Navbar = () => {
   };
 
   const profileImage = user?.profilePic || null;
-  console.log("Profile image URL: ", profileImage);
-  console.log(typeof profileImage);
 
   return (
     <nav className="w-full bg-white shadow-md px-4 md:px-6 py-6 relative z-50">

@@ -211,7 +211,6 @@ export const UserProvider = ({ children }) => {
         }
       );
 
-      console.log("📦 Test Drives:", res.data);
       return { success: true, data: res.data };
     } catch (err) {
       console.error("❌ Failed to fetch test drives:", err);

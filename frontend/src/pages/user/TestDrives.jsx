@@ -15,7 +15,6 @@ const TestDrives = () => {
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
         setBookings(sorted);
-        console.log("🚘 Test Drive Bookings:", sorted);
       } else {
         console.error("❌ Failed to fetch:", message);
         setBookings([]);
