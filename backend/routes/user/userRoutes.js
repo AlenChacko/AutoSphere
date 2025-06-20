@@ -3,6 +3,7 @@ import {
   registerUser,
   loginUser,
   resetPassword,
+  googleLogin, // ✅ Import google login controller
 } from "../../controllers/user/authController.js";
 import {
   addToWishlist,
@@ -25,18 +26,16 @@ import { uploadProfile, uploadUsedCar } from "../../middlewares/multer.js";
 
 export const userRouter = express.Router();
 
+// ✅ Auth
 userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
+userRouter.post("/google-login", googleLogin); // ✅ Google login route
+userRouter.put("/reset-password/:id", userAuth, resetPassword);
+
+// ✅ Car Listings
 userRouter.get("/cars", getAllCars);
-userRouter.get("/profile", userAuth, getUserInfo);
-userRouter.patch(
-  "/profile/update",
-  userAuth,
-  uploadProfile.single("profilePic"),
-  updateProfile
-);
-userRouter.post("/book/testdrive", userAuth, bookTestDrive);
-userRouter.get("/testdrives", userAuth, getUserTestDrives);
+userRouter.get("/used-cars", getAllUsedCars);
+userRouter.get("/used-car/:id", getUsedCarById);
 userRouter.post(
   "/add-used-car",
   userAuth,
@@ -44,18 +43,28 @@ userRouter.post(
   addUsedCar
 );
 userRouter.get("/my-used-cars", userAuth, getMyUsedCars);
-userRouter.get("/used-cars", getAllUsedCars);
-userRouter.get('/used-car/:id',getUsedCarById)
-
 userRouter.put(
   "/update/used-car/:id",
   userAuth,
-  uploadUsedCar.array("images", 5), // Max 5 files
+  uploadUsedCar.array("images", 5),
   updateUsedCar
 );
+userRouter.patch("/mark-sold/:id", userAuth, markUsedCarAsSold);
 
+// ✅ Profile
+userRouter.get("/profile", userAuth, getUserInfo);
+userRouter.patch(
+  "/profile/update",
+  userAuth,
+  uploadProfile.single("profilePic"),
+  updateProfile
+);
+
+// ✅ Test Drives
+userRouter.post("/book/testdrive", userAuth, bookTestDrive);
+userRouter.get("/testdrives", userAuth, getUserTestDrives);
+
+// ✅ Wishlist
 userRouter.post("/wishlist/:carId", userAuth, addToWishlist);
 userRouter.delete("/wishlist/:carId", userAuth, removeFromWishlist);
 userRouter.get("/wishlist", userAuth, getWishlist);
-userRouter.patch("/mark-sold/:id", userAuth, markUsedCarAsSold)
-userRouter.put("/reset-password/:id", userAuth, resetPassword);

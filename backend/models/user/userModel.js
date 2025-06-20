@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
     },
+    isGoogleUser: {
+      type: Boolean,
+      default: false, // 👈 New field
+    },
     phone: {
       type: String,
       default: "",
@@ -46,18 +50,16 @@ const userSchema = new mongoose.Schema(
       public_id: { type: String, default: "" },
       url: { type: String, default: "" },
     },
-
     testDrives: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "TestDriveBooking",
       },
     ],
-
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "UsedCar", // Or your actual used car model name
+        ref: "UsedCar",
       },
     ],
   },

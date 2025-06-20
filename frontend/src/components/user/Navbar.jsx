@@ -8,13 +8,12 @@ import {
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
-const messageCount = 5;
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const { user, logoutUser, unreadCount } = useUser(); // Assuming messageCount is from context
+  const { user, logoutUser, unreadCount } = useUser();
   const navigate = useNavigate();
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
@@ -24,6 +23,10 @@ const Navbar = () => {
     logoutUser();
     navigate("/");
   };
+
+  const profileImage = user?.profilePic || null;
+  console.log("Profile image URL: ", profileImage);
+  console.log(typeof profileImage);
 
   return (
     <nav className="w-full bg-white shadow-md px-4 md:px-6 py-6 relative z-50">
@@ -38,7 +41,7 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Hamburger Icon (Mobile Only) */}
+        {/* Hamburger Icon */}
         <button
           onClick={toggleMobileMenu}
           className="text-3xl text-gray-700 md:hidden focus:outline-none"
@@ -64,7 +67,6 @@ const Navbar = () => {
             USED CARS
           </Link>
 
-          {/* 🔍 Search Input */}
           <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
             <input
               type="text"
@@ -76,7 +78,6 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* ✅ Messages – only if logged in */}
           {user && (
             <Link
               to="/inbox"
@@ -84,26 +85,26 @@ const Navbar = () => {
             >
               <FaEnvelope />
               Inbox
-              {unreadCount  > 0 && (
+              {unreadCount > 0 && (
                 <span className="ml-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  {unreadCount }
+                  {unreadCount}
                 </span>
               )}
             </Link>
           )}
 
-          {/* Profile or Login */}
           {user ? (
             <div className="relative">
               <button
                 onClick={toggleDropdown}
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
               >
-                {user?.profilePic?.url ? (
+                {profileImage ? (
                   <img
-                    src={user.profilePic.url}
+                    src={profileImage}
                     alt="Profile"
-                    className="w-8 h-8 rounded-full object-cover"
+                    referrerPolicy="no-referrer"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
                   />
                 ) : (
                   <FaUserCircle size={28} />
@@ -173,9 +174,9 @@ const Navbar = () => {
             >
               <FaEnvelope />
               Inbox
-              {unreadCount  > 0 && (
+              {unreadCount > 0 && (
                 <span className="ml-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  {unreadCount }
+                  {unreadCount}
                 </span>
               )}
             </Link>
@@ -186,11 +187,12 @@ const Navbar = () => {
                   onClick={toggleDropdown}
                   className="flex items-center gap-2 px-2 py-1 text-sm text-gray-700 hover:text-blue-600 w-full"
                 >
-                  {user?.profilePic ? (
+                  {profileImage ? (
                     <img
-                      src={user.profilePic.url}
+                      src={profileImage}
                       alt="Profile"
-                      className="w-8 h-8 rounded-full object-cover"
+                      referrerPolicy="no-referrer"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
                     />
                   ) : (
                     <FaUserCircle size={28} />

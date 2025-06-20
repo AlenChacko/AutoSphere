@@ -18,9 +18,18 @@ export const UserProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const loginUser = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const normalizedUser = {
+    ...userData,
+    profilePic:
+      typeof userData.profilePic === "object"
+        ? userData.profilePic.url
+        : userData.profilePic || "",
   };
+
+  setUser(normalizedUser);
+  localStorage.setItem("user", JSON.stringify(normalizedUser));
+};
+
 
   const logoutUser = () => {
     setUser(null);

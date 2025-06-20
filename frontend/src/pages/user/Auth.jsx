@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { useFormik } from "formik";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 import {
   loginSchema,
   registerSchema,
@@ -47,8 +48,7 @@ const Auth = () => {
             };
 
         const { data } = await axios.post(endpoint, payload);
-
-        loginUser(data.user); // ✅ Sets context and localStorage
+        loginUser(data.user);
 
         toast.success(
           data.message ||
@@ -63,6 +63,31 @@ const Auth = () => {
     },
   });
 
+  const handleGoogleLogin = async (credentialResponse) => {
+  try {
+    const decoded = jwtDecode(credentialResponse.credential);
+    const { given_name, family_name, email, picture } = decoded;
+
+    const googleUser = {
+      name: `${given_name} ${family_name}`,
+      email,
+      picture,
+    };
+
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/google-login`,
+      googleUser
+    );
+
+    loginUser(data.user);
+    toast.success("Google login successful");
+    navigate("/");
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Google login failed");
+  }
+};
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-lg">
@@ -70,22 +95,23 @@ const Auth = () => {
           {isLogin ? "Login to AutoSphere" : "Register for AutoSphere"}
         </h2>
 
-        <div className="mb-4">
-          <button
-            type="button"
-            onClick={() => alert("Google Sign-In will be handled here")}
-            className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg hover:bg-gray-50 transition"
-          >
-            <FcGoogle className="text-xl" />
-            <span className="text-sm font-medium">Continue with Google</span>
-          </button>
-        </div>
+        {isLogin && (
+          <div className="mb-4 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => toast.error("Google login failed")}
+              width="100%"
+            />
+          </div>
+        )}
 
-        <div className="flex items-center justify-between mb-4">
-          <span className="h-px flex-1 bg-gray-300"></span>
-          <span className="px-2 text-sm text-gray-400">or</span>
-          <span className="h-px flex-1 bg-gray-300"></span>
-        </div>
+        {isLogin && (
+          <div className="flex items-center justify-between mb-4">
+            <span className="h-px flex-1 bg-gray-300"></span>
+            <span className="px-2 text-sm text-gray-400">or</span>
+            <span className="h-px flex-1 bg-gray-300"></span>
+          </div>
+        )}
 
         <form onSubmit={formik.handleSubmit} className="space-y-4">
           {!isLogin && (
